@@ -88,6 +88,7 @@ export function HeroReel({ reel }: { reel: HeroReelConfig }) {
     let incoming: number | null = null;
     let phase: Phase = "starting";
     let fade: Animation | null = null;
+    let fadeGuard = 0;
     let stalled = false;
     let trigger = 0;
     let inView = true;
@@ -182,21 +183,59 @@ export function HeroReel({ reel }: { reel: HeroReelConfig }) {
         fill: "forwards",
       });
       if (!shouldRun() || stalled) fade.pause();
-      await fade.finished;
+      else guardFade();
+      try {
+        await fade.finished;
+      } finally {
+        unguardFade();
+      }
       video.style.opacity = "1";
       fade.cancel();
       fade = null;
+    }
+
+    /**
+     * En toning drivs av webbläsarens bildrutor. Ritas inga (t.ex. i en dold
+     * förhandsvisning som ändå räknas som synlig) står den still, och rullen
+     * med den. Den här timern avslutar toningen när tiden har gått, så att
+     * rullen håller takten ändå. Den pausas och startas med toningen.
+     */
+    function guardFade() {
+      unguardFade();
+      if (!fade || fade.playState !== "running") return;
+      const elapsed = Number(fade.currentTime ?? 0);
+      const left = Math.max(0, reel.crossfade * 1000 - elapsed);
+      fadeGuard = window.setTimeout(() => {
+        fadeGuard = 0;
+        if (fade?.playState === "running") fade.finish();
+      }, left + 50);
+    }
+
+    function unguardFade() {
+      if (fadeGuard) window.clearTimeout(fadeGuard);
+      fadeGuard = 0;
+    }
+
+    function pauseFade() {
+      fade?.pause();
+      unguardFade();
+    }
+
+    function resumeFade() {
+      if (!fade) return;
+      fade.play();
+      guardFade();
     }
 
     // Buffrar det inkommande klippet står toningen still – det utgående lagret
     // ligger kvar helt synligt under tiden.
     const onWaiting = () => {
       stalled = true;
-      fade?.pause();
+      pauseFade();
     };
     const onPlaying = () => {
       stalled = false;
-      if (shouldRun()) fade?.play();
+      if (shouldRun()) resumeFade();
     };
 
     function stop() {
@@ -328,7 +367,7 @@ export function HeroReel({ reel }: { reel: HeroReelConfig }) {
       if (signal.aborted) return;
       if (!shouldRun()) {
         for (const video of videos) video.pause();
-        fade?.pause();
+        pauseFade();
         clearTrigger();
         return;
       }
@@ -339,7 +378,7 @@ export function HeroReel({ reel }: { reel: HeroReelConfig }) {
       }
       if (phase === "fading" && incoming !== null) {
         void videos[incoming].play().catch(() => {});
-        if (!stalled) fade?.play();
+        if (!stalled) resumeFade();
       }
       while (waiters.length > 0) waiters.shift()!();
       // Uppspelningen kommer igång en bråkdel senare – timern ställs när den gör det.
@@ -370,6 +409,7 @@ export function HeroReel({ reel }: { reel: HeroReelConfig }) {
       controller.abort();
       observer.disconnect();
       clearTrigger();
+      unguardFade();
       fade?.cancel();
       syncRef.current = () => {};
       for (const video of videos) {
@@ -394,7 +434,13 @@ export function HeroReel({ reel }: { reel: HeroReelConfig }) {
 
   return (
     <>
-      <div ref={containerRef} aria-hidden="true" className="absolute inset-0 overflow-hidden">
+      {/* isolate: lagrens z-index gäller bara inom rullen, så att toningen
+          (.hero-scrim) och texten i headern alltid ligger ovanpå filmen. */}
+      <div
+        ref={containerRef}
+        aria-hidden="true"
+        className="absolute inset-0 isolate overflow-hidden"
+      >
         {/* Stillbild ur första klippet: syns före filmen, utan JavaScript och
             vid minskad rörelse. */}
         <Image
