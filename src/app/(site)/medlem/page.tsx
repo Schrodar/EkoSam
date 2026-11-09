@@ -7,13 +7,23 @@ import {
   maintenanceStatusLabel,
 } from "@/lib/maintenance-status";
 import { Badge, Card, CardBody } from "@/components/ui";
+import type { SiteFeatures } from "@/config/siteConfig";
+import { isEnabled } from "@/lib/features";
 
-const shortcuts = [
+const shortcuts: {
+  href: string;
+  title: string;
+  description: string;
+  apartmentOnly: boolean;
+  /** Genvägen finns bara när funktionen är påslagen (siteConfig.features). */
+  feature?: keyof SiteFeatures;
+}[] = [
   {
     href: "/medlem/min-lagenhet",
     title: "Min lägenhet",
     description: "Uppgifter om lägenheten och planritningen.",
     apartmentOnly: true,
+    feature: "floorPlans",
   },
   {
     href: "/medlem/felanmalningar",
@@ -32,6 +42,7 @@ const shortcuts = [
     title: "Sälja bostaden",
     description: "Skapa och publicera en annons för lägenheten.",
     apartmentOnly: true,
+    feature: "listings",
   },
 ];
 
@@ -44,7 +55,11 @@ export default async function MemberDashboard() {
     (r) => isActiveMaintenanceStatus(r.status) || r.hasUpdate,
   );
   // Min lägenhet och Sälja hör till lägenhetens konto.
-  const visible = shortcuts.filter((s) => user.apartmentNumber || !s.apartmentOnly);
+  const visible = shortcuts.filter(
+    (s) =>
+      (user.apartmentNumber || !s.apartmentOnly) &&
+      (!s.feature || isEnabled(s.feature)),
+  );
 
   return (
     <div className="space-y-8">

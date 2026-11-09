@@ -27,9 +27,12 @@ export const terms = {
   units: "fastigheter",
   Units: "Fastigheter",
   unitsDefinite: "fastigheterna",
+  UnitsDefinite: "Fastigheterna",
   /** "fastighetens konto". */
   unitGenitive: "fastighetens",
   UnitGenitive: "Fastighetens",
+  /** Sammansatt: "fastighetskonto". */
+  unitAccount: "fastighetskonto",
   /** Numret medlemmen loggar in med – föreningens eget nummer. */
   unitNumber: "fastighetsnummer",
   UnitNumber: "Fastighetsnummer",

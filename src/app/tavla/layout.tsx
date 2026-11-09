@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { requireFeature } from "@/lib/features";
 
 /**
  * Trapphustavlan: helskärm i en låst webbläsare, utan sajtens header och
@@ -23,6 +24,8 @@ export const viewport: Viewport = {
 };
 
 export default function BoardLayout({ children }: { children: React.ReactNode }) {
+  // Trapphustavlorna kan vara avstängda för föreningen – se siteConfig.features.
+  requireFeature("displays");
   return (
     <>
       {/*

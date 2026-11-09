@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getBoardData, getDisplayByToken } from "@/lib/data";
+import { isEnabled } from "@/lib/features";
 
 /**
  * Innehållet till en trapphustavla. Skärmen skickar sin token som
@@ -15,6 +16,10 @@ export const dynamic = "force-dynamic";
 const NO_STORE = { "Cache-Control": "private, no-store" } as const;
 
 export async function GET(request: Request) {
+  // Trapphustavlorna kan vara avstängda för föreningen – se siteConfig.features.
+  if (!isEnabled("displays")) {
+    return new NextResponse("Hittades inte", { status: 404, headers: NO_STORE });
+  }
   const auth = request.headers.get("authorization") ?? "";
   const token = auth.startsWith("Bearer ") ? auth.slice(7).trim() : "";
   const display = await getDisplayByToken(token);

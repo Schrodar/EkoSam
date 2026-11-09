@@ -6,6 +6,7 @@ import {
 } from "@/components/layout/sub-nav";
 import { requireApprovedMember } from "@/lib/auth";
 import { getMemberMaintenanceSummary } from "@/lib/data";
+import { isEnabled } from "@/lib/features";
 import type { MemberMaintenanceSummary } from "@/lib/types";
 
 /**
@@ -36,17 +37,21 @@ export default async function MemberLayout({
   // Lägenhetens konto har en lägenhet. Styrelsens personliga konton har det
   // inte – de ser Översikt, Felanmälningar och Dokument.
   const apartment = user.apartmentNumber;
+  // Min lägenhet och Sälja finns bara när funktionerna är påslagna
+  // (siteConfig.features).
+  const myHome = Boolean(apartment) && isEnabled("floorPlans");
+  const sell = Boolean(apartment) && isEnabled("listings");
 
   const memberNav: SubNavItem[] = [
     { href: "/medlem", label: "Översikt" },
-    ...(apartment ? [{ href: "/medlem/min-lagenhet", label: "Min lägenhet" }] : []),
+    ...(myHome ? [{ href: "/medlem/min-lagenhet", label: "Min lägenhet" }] : []),
     {
       href: "/medlem/felanmalningar",
       label: "Felanmälningar",
       badge: maintenanceBadge(maintenance),
     },
     { href: "/medlem/dokument", label: "Dokument" },
-    ...(apartment ? [{ href: "/medlem/salja", label: "Sälja bostaden" }] : []),
+    ...(sell ? [{ href: "/medlem/salja", label: "Sälja bostaden" }] : []),
   ];
 
   return (

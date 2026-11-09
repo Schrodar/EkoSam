@@ -8,6 +8,7 @@ import {
 } from "@/lib/data";
 import type { ApartmentAccount } from "@/lib/data/access-codes";
 import { formatDate } from "@/lib/utils";
+import { isEnabled } from "@/lib/features";
 import { Card, CardBody, PageHeader } from "@/components/ui";
 import { FactsForm } from "@/components/apartment/facts-form";
 import { FloorPlanManager } from "@/components/apartment/floor-plan-manager";
@@ -75,18 +76,21 @@ export default async function AdminApartmentEditPage({ params }: Props) {
         </CardBody>
       </Card>
 
-      <Card>
-        <CardBody className="space-y-3">
-          <h3 className="font-semibold">Planritning</h3>
-          <FloorPlanManager
-            apartment={apartment}
-            uploadAction={uploadFloorPlanAction}
-            removeAction={removeFloorPlanAction}
-          />
-        </CardBody>
-      </Card>
+      {isEnabled("floorPlans") ? (
+        <Card>
+          <CardBody className="space-y-3">
+            <h3 className="font-semibold">Planritning</h3>
+            <FloorPlanManager
+              apartment={apartment}
+              uploadAction={uploadFloorPlanAction}
+              removeAction={removeFloorPlanAction}
+            />
+          </CardBody>
+        </Card>
+      ) : null}
 
       {/* Försäljningen bor under Till salu – här finns bara vägen dit. */}
+      {isEnabled("listings") ? (
       <Card>
         <CardBody className="flex flex-wrap items-center justify-between gap-3">
           {apartment.forSale ? (
@@ -116,6 +120,7 @@ export default async function AdminApartmentEditPage({ params }: Props) {
           )}
         </CardBody>
       </Card>
+      ) : null}
 
       <Card>
         <CardBody className="space-y-5">

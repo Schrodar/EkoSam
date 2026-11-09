@@ -17,13 +17,17 @@
 
 /**
  * Grupperad navigation för sidomenyn (accordion). Medlemslänken ("Mina sidor"
- * / "Admin") läggs till dynamiskt i gruppen "För boende" av NavDrawer när någon
- * är inloggad. Logga in/ut ligger i headern (auth-button.tsx), inte här.
+ * / "Admin") läggs till dynamiskt i gruppen med id "boende" av NavDrawer när
+ * någon är inloggad. Logga in/ut ligger i headern (auth-button.tsx), inte här.
+ *
+ * EkoSam: gruppen "Köpa bostad" finns inte – Till salu och För mäklare är
+ * avstängda (siteConfig.features) – och Föreningens ekonomi ligger under Om
+ * föreningen. Sidan /fastigheten handlar om området och dess anläggningar.
  */
 export const navGroups = [
   {
     id: "boende",
-    title: "För boende",
+    title: "För medlemmar",
     items: [
       { href: "/nyheter", label: "Nyheter" },
       { href: "/dokument", label: "Dokument" },
@@ -39,15 +43,7 @@ export const navGroups = [
       { href: "/styrelse", label: "Styrelse" },
       { href: "/stadgar", label: "Stadgar" },
       { href: "/arsredovisningar", label: "Årsredovisningar" },
-      { href: "/fastigheten", label: "Fastigheten" },
-    ],
-  },
-  {
-    id: "kopa",
-    title: "Köpa bostad",
-    items: [
-      { href: "/till-salu", label: "Till salu" },
-      { href: "/for-maklare", label: "För mäklare" },
+      { href: "/fastigheten", label: "Området" },
       { href: "/ekonomi", label: "Föreningens ekonomi" },
     ],
   },

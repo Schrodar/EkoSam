@@ -59,6 +59,11 @@ export interface SiteFeatures {
   floorPlans: boolean;
   /** För mäklare: fakta för mäklare och köpare. */
   brokerPage: boolean;
+  /**
+   * Bostadsrätternas nyckeltal (avgift och skuld per kvm bostadsrätt med mera)
+   * på Föreningens ekonomi och under Admin → Föreningsinfo → Ekonomi.
+   */
+  keyFigures: boolean;
 }
 
 const features: SiteFeatures = {
@@ -66,6 +71,7 @@ const features: SiteFeatures = {
   displays: false,
   floorPlans: false,
   brokerPage: false,
+  keyFigures: false,
 };
 
 export const siteConfig = {

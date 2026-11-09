@@ -7,6 +7,8 @@ import {
 } from "@/lib/data";
 import { StaleFiguresNotice } from "@/components/key-figures";
 import { Card, CardBody } from "@/components/ui";
+import { terms } from "@/config/terms";
+import { isEnabled } from "@/lib/features";
 
 function StatCard({
   label,
@@ -40,19 +42,26 @@ function StatCard({
 }
 
 export default async function AdminDashboard() {
+  const listings = isEnabled("listings");
+  const keyFigures = isEnabled("keyFigures");
   const [maintenance, news, economy, submittedListings] = await Promise.all([
     getMaintenanceRequests(),
     getAllNews(),
-    getEconomyFigures(),
-    countSubmittedListings(),
+    keyFigures ? getEconomyFigures() : Promise.resolve(null),
+    listings ? countSubmittedListings() : Promise.resolve(0),
   ]);
 
   const newRequests = maintenance.filter((r) => r.status !== "atgardad").length;
   const drafts = news.filter((n) => !n.published).length;
+  const handles = [
+    "felanmälningar",
+    ...(listings ? ["annonser"] : []),
+    ...(isEnabled("displays") ? ["trapphustavlor"] : []),
+  ];
 
   return (
     <div className="space-y-8">
-      <StaleFiguresNotice figures={economy} showLink />
+      {economy ? <StaleFiguresNotice figures={economy} showLink /> : null}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard
@@ -61,12 +70,14 @@ export default async function AdminDashboard() {
           href="/admin/felanmalningar"
           highlight
         />
-        <StatCard
-          label="Annonser att godkänna"
-          value={submittedListings}
-          href="/admin/till-salu"
-          highlight
-        />
+        {listings ? (
+          <StatCard
+            label="Annonser att godkänna"
+            value={submittedListings}
+            href="/admin/till-salu"
+            highlight
+          />
+        ) : null}
         <StatCard
           label="Utkast (nyheter)"
           value={drafts}
@@ -80,9 +91,12 @@ export default async function AdminDashboard() {
           <p className="mt-1 text-sm text-muted">
             Härifrån hanterar styrelsen allt innehåll på sidan. Använd flikarna
             ovan för att redigera nyheter, dokument, styrelseuppgifter och
-            föreningsfakta och för att hantera felanmälningar, annonser och
-            trapphustavlor. Under Styrelse → Konton ger ni en ledamots
-            lägenhetskonto admin-rätt. Lägenheternas koder sköts av JnM.
+            föreningsfakta och för att hantera{" "}
+            {handles.length > 1
+              ? `${handles.slice(0, -1).join(", ")} och ${handles.at(-1)}`
+              : handles[0]}
+            . Under Styrelse → Konton ger ni en ledamots {terms.unitAccount}{" "}
+            admin-rätt. {terms.UnitsDefinite}s koder sköts av JnM.
           </p>
         </CardBody>
       </Card>

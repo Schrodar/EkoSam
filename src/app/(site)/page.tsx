@@ -5,27 +5,32 @@ import { getPublishedListings, getPublishedNews, getSiteContent } from "@/lib/da
 import { Container, Section, SectionHeading } from "@/components/ui";
 import { NewsCard } from "@/components/news-card";
 import { ListingCard } from "@/components/apartment/listing-card";
+import { isEnabled } from "@/lib/features";
 
 const quickLinks = [
   {
     href: "/felanmalan",
     title: "Felanmälan",
-    text: "Anmäl fel i fastigheten eller gemensamma utrymmen.",
+    text: "Anmäl fel på vägar, belysning och andra gemensamma anläggningar.",
   },
   {
     href: "/dokument",
     title: "Dokument",
     text: "Stadgar, årsredovisning, ordningsregler med mera.",
   },
-  {
-    href: "/for-maklare",
-    title: "För mäklare",
-    text: "Föreningsfakta för mäklare och spekulanter.",
-  },
+  ...(isEnabled("brokerPage")
+    ? [
+        {
+          href: "/for-maklare",
+          title: "För mäklare",
+          text: "Föreningsfakta för mäklare och spekulanter.",
+        },
+      ]
+    : []),
   {
     href: "/medlem",
     title: "Medlemssidor",
-    text: "Din lägenhet och föreningens interna dokument.",
+    text: "Era felanmälningar och föreningens interna dokument.",
   },
 ];
 
@@ -33,7 +38,7 @@ export default async function HomePage() {
   const [content, news, listings] = await Promise.all([
     getSiteContent(),
     getPublishedNews(),
-    getPublishedListings(),
+    isEnabled("listings") ? getPublishedListings() : Promise.resolve([]),
   ]);
   const latest = news.slice(0, 3);
   const forSale = listings.slice(0, 3);
@@ -62,7 +67,11 @@ export default async function HomePage() {
 
       {/* Snabblänkar */}
       <Container>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div
+          className={`grid gap-5 sm:grid-cols-2 ${
+            quickLinks.length === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3"
+          }`}
+        >
           {quickLinks.map((link) => (
             <Link
               key={link.href}

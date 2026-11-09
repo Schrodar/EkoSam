@@ -1,16 +1,34 @@
 import { Container } from "@/components/ui";
 import { SubNav, type SubNavItem } from "@/components/layout/sub-nav";
 import { getSupportSession, requireAdmin } from "@/lib/auth";
+import { terms } from "@/config/terms";
+import { isEnabled } from "@/lib/features";
 import { formatDateTime } from "@/lib/utils";
 import { endSupportAction } from "./support/actions";
 
 /**
- * Menyn. Hus, lägenheter och koderna sköts av plattformsägaren (JnM) i ett
- * supportläge – styrelsen ser varken fliken eller sidorna, som själva kräver
- * requireSupport(). Konton, där lägenheternas konton får admin-rätt, ser både
- * styrelsen och JnM.
+ * Fastighetsfliken. Registret (områden, fastigheter och koderna) sköts av
+ * plattformsägaren (JnM) i ett supportläge. Till salu och Trapphustavlor finns
+ * bara när de är påslagna (siteConfig.features). Utan innehåll ingen flik.
+ */
+function propertyNav(support: boolean): SubNavItem | null {
+  const items: SubNavItem[] = [
+    ...(support ? [{ href: "/admin/lagenheter", label: terms.Units }] : []),
+    ...(isEnabled("listings") ? [{ href: "/admin/till-salu", label: "Till salu" }] : []),
+    ...(isEnabled("displays") ? [{ href: "/admin/tavlor", label: "Trapphustavlor" }] : []),
+  ];
+  if (items.length === 0) return null;
+  if (items.length === 1) return items[0];
+  return { href: items[0].href, label: "Fastigheten", children: items };
+}
+
+/**
+ * Menyn. Registret och koderna sköts av JnM i supportläget – styrelsen ser
+ * varken fliken eller sidorna, som själva kräver requireSupport(). Konton, där
+ * fastigheternas konton får admin-rätt, ser både styrelsen och JnM.
  */
 function adminNav(support: boolean): SubNavItem[] {
+  const property = propertyNav(support);
   return [
     { href: "/admin", label: "Översikt" },
     { href: "/admin/nyheter", label: "Nyheter" },
@@ -41,17 +59,7 @@ function adminNav(support: boolean): SubNavItem[] {
         { href: "/admin/felanmalningar/mote", label: "Mötesläge" },
       ],
     },
-    {
-      href: support ? "/admin/lagenheter" : "/admin/till-salu",
-      label: "Fastigheten",
-      children: [
-        ...(support
-          ? [{ href: "/admin/lagenheter", label: "Hus och lägenheter" }]
-          : []),
-        { href: "/admin/till-salu", label: "Till salu" },
-        { href: "/admin/tavlor", label: "Trapphustavlor" },
-      ],
-    },
+    ...(property ? [property] : []),
     { href: "/admin/supportlogg", label: "Supportlogg" },
   ];
 }
