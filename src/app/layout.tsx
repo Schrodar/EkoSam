@@ -33,13 +33,37 @@ export const revalidate = 600;
 export async function generateMetadata(): Promise<Metadata> {
   const association = await getAssociationProfile();
   const place = association.city ? ` i ${association.city}` : "";
+  const siteUrl = "https://ekbacken.byjnm.se";
+  const description = `${association.name}${place}. Här hittar du information för medlemmar och besökare.`;
+  const sharingImage = new URL("/images/ekbacken-share-v1.jpg", siteUrl).toString();
   return {
-    metadataBase: new URL(siteConfig.seo.siteUrl),
+    metadataBase: new URL(siteUrl),
     title: {
       default: association.name,
       template: `%s | ${shortNameOf(association)}`,
     },
-    description: `${association.name}${place}. Här hittar du information för medlemmar och besökare.`,
+    description,
+    openGraph: {
+      type: "website",
+      locale: "sv_SE",
+      url: siteUrl,
+      siteName: association.name,
+      title: association.name,
+      description,
+      images: [{
+        url: sharingImage,
+        width: 1200,
+        height: 630,
+        type: "image/jpeg",
+        alt: "Ekbackens samfällighetsförening – vår gemensamma plats, med solbelysta ekblad.",
+      }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: association.name,
+      description,
+      images: [sharingImage],
+    },
     icons: { icon: siteConfig.logo.favicon },
   };
 }
