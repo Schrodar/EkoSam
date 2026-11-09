@@ -26,6 +26,7 @@ import {
   SubmitButton,
 } from "@/components/ui";
 import { cn } from "@/lib/utils";
+import { unitName } from "@/config/terms";
 import { updateRequestAction } from "./actions";
 import { ReplyEmailButton, RequestFields } from "./request-fields";
 
@@ -179,7 +180,7 @@ function RequestModal({
           <span className="inline-flex items-center gap-1.5">
             Anmäld av:{" "}
             {request.reporterApartment
-              ? `Lägenhet ${request.reporterApartment}`
+              ? unitName(request.reporterApartment)
               : request.name || "Anonym"}
             {request.memberId ? <Badge tone="brand">Mina sidor</Badge> : null}
           </span>

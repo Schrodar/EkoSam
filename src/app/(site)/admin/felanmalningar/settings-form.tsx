@@ -33,7 +33,7 @@ export function SettingsForm({ settings }: { settings: MaintenanceSettings }) {
       <Field
         label="Förklaring högst upp"
         htmlFor="introText"
-        hint="Vad som är föreningens ansvar och vad den boende svarar för själv."
+        hint="Vad som är föreningens ansvar och vad fastighetsägaren svarar för själv."
       >
         <Textarea
           id="introText"

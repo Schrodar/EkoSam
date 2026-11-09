@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
+import { terms } from "@/config/terms";
 
 /**
  * =============================================================================
@@ -58,8 +59,8 @@ const MODELS: Record<string, { label: string; nameField?: string }> = {
   MaintenanceCategory: { label: "felanmälningskategori", nameField: "name" },
   MaintenanceSettings: { label: "texter på felanmälningssidan" },
   MaintenanceRequest: { label: "felanmälan", nameField: "location" },
-  Building: { label: "hus", nameField: "name" },
-  Apartment: { label: "lägenhet", nameField: "number" },
+  Building: { label: terms.group, nameField: "name" },
+  Apartment: { label: terms.unit, nameField: "number" },
   ApartmentPhoto: { label: "lägenhetsbild" },
   SiteContent: { label: "sidinnehåll" },
   AssociationInfo: { label: "föreningsfakta" },

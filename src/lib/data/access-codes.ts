@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { getTenantDb } from "@/lib/tenant";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { compareApartmentNumbers } from "@/lib/numbering";
+import { unitName } from "@/config/terms";
 import { releaseApartment } from "./apartments";
 import { findAuthUserId } from "./auth-users";
 
@@ -200,7 +201,7 @@ export async function redeemAccessCode(
       data: {
         associationId,
         email,
-        fullName: `Lägenhet ${apartment.number}`,
+        fullName: unitName(apartment.number),
         apartment: apartment.number,
         role: "member",
         status: "approved",
@@ -374,6 +375,6 @@ export async function syncApartmentAccountName(apartmentId: string): Promise<voi
   if (!apartment || !owner || !isApartmentAccountEmail(owner.email)) return;
   await db.member.updateMany({
     where: { id: owner.id },
-    data: { fullName: `Lägenhet ${apartment.number}`, apartment: apartment.number },
+    data: { fullName: unitName(apartment.number), apartment: apartment.number },
   });
 }

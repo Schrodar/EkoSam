@@ -39,7 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
       default: association.name,
       template: `%s | ${shortNameOf(association)}`,
     },
-    description: `${association.name}${place}. Här hittar du information för boende, mäklare och besökare.`,
+    description: `${association.name}${place}. Här hittar du information för medlemmar och besökare.`,
     icons: { icon: siteConfig.logo.favicon },
   };
 }

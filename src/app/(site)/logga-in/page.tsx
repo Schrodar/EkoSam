@@ -33,7 +33,7 @@ export default async function LoginPage({
           Logga in
         </h1>
         <p className="mt-2 text-center text-sm text-muted">
-          För boende och styrelse i föreningen.
+          För medlemmar och styrelse i föreningen.
         </p>
         <Card className="mt-6">
           <CardBody>

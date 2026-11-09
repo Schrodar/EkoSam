@@ -64,7 +64,7 @@ export default async function MemberDashboard() {
   return (
     <div className="space-y-8">
       <p className="text-sm text-muted">
-        Här hittar du det som bara är för boende i föreningen.
+        Här hittar du det som bara är för medlemmar i föreningen.
       </p>
 
       {current.length > 0 ? (

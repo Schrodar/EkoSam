@@ -30,13 +30,16 @@ export {
   maintenanceStatusLabel,
 } from "@/lib/maintenance-status";
 
-/** Kategorierna en ny förening startar med. Går att ändra i admin efteråt. */
+/**
+ * Kategorierna en ny förening startar med. Går att ändra i admin efteråt.
+ * EkoSam: samfällighetens gemensamma anläggningar i stället för husets.
+ */
 export const DEFAULT_MAINTENANCE_CATEGORIES = [
-  "VVS / vatten",
-  "El / belysning",
-  "Hiss",
-  "Tvättstuga",
-  "Utomhus / gård",
+  "Vägar och gångvägar",
+  "Belysning",
+  "Lekplats",
+  "Grönytor och träd",
+  "Snöröjning och halka",
   "Övrigt",
 ];
 
@@ -50,13 +53,13 @@ export const DEFAULT_MAINTENANCE_CATEGORIES = [
  */
 export const DEFAULT_MAINTENANCE_SETTINGS: MaintenanceSettings = {
   introText:
-    "Felanmälan gäller fastigheten och de gemensamma utrymmena – det som föreningen ansvarar för. Fel inne i din egen lägenhet ansvarar du som boende för själv, till exempel egna vitvaror, ytskikt och inredning.",
+    "Felanmälan gäller samfällighetens gemensamma anläggningar – till exempel vägar, belysning, lekplats och grönytor. Fel på din egen fastighet ansvarar du som fastighetsägare för själv.",
   emergencyPhone: "",
   emergencyText: "",
   caretakerName: "",
   caretakerPhone: "",
   caretakerText:
-    "Fastighetsskötaren är en upphandlad tjänst utanför styrelsen. Beställer du arbete som rör din egen lägenhet betalar du det själv.",
+    "Skötseln är en upphandlad tjänst utanför styrelsen. Beställer du arbete som rör din egen fastighet betalar du det själv.",
 };
 
 function toCategory(c: DbCategory): MaintenanceCategory {

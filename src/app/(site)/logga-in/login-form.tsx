@@ -5,6 +5,7 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { loginAction, type AuthState } from "@/lib/actions/auth";
 import { Button, Field, FormError, Input } from "@/components/ui";
+import { terms } from "@/config/terms";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -26,10 +27,10 @@ export function LoginForm({ next }: { next: string | null }) {
       {next ? <input type="hidden" name="next" value={next} /> : null}
 
       <Field
-        label="Lägenhetsnummer"
+        label={terms.UnitNumber}
         htmlFor="identifier"
         required
-        hint="Står i brevet från föreningen. Styrelsen loggar in med sin e-post."
+        hint="Står i brevet från föreningen. Den som har ett personligt konto loggar in med sin e-post."
       >
         <Input
           id="identifier"

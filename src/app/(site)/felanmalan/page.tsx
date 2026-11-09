@@ -24,7 +24,7 @@ export default async function MaintenancePage() {
     <Section>
       <Container className="max-w-3xl">
         <PageIntro
-          eyebrow="För boende"
+          eyebrow="För medlemmar"
           title="Felanmälan"
           description="Anmäl fel i fastigheten eller de gemensamma utrymmena till styrelsen."
         />

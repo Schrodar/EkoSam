@@ -29,7 +29,7 @@ export default async function AdminMaintenancePage() {
     <div className="space-y-4">
       <PageHeader
         title="Felanmälningar"
-        description="Ärendena du hanterar, och inställningarna som styr hur felanmälningssidan ser ut för de boende."
+        description="Ärendena du hanterar, och inställningarna som styr hur felanmälningssidan ser ut för medlemmarna."
       />
 
       {/* Ärendena är sidans syfte och ligger därför öppen; inställningarna

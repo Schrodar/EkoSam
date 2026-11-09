@@ -7,6 +7,7 @@ import {
 import { requireApprovedMember } from "@/lib/auth";
 import { getMemberMaintenanceSummary } from "@/lib/data";
 import { isEnabled } from "@/lib/features";
+import { unitName } from "@/config/terms";
 import type { MemberMaintenanceSummary } from "@/lib/types";
 
 /**
@@ -59,7 +60,7 @@ export default async function MemberLayout({
       <Container className="pt-10 sm:pt-12">
         <p className="eyebrow">Mina sidor</p>
         <h1 className="title-section mt-3">
-          {apartment ? `Lägenhet ${apartment}` : `Hej ${user.fullName.split(" ")[0]}!`}
+          {apartment ? unitName(apartment) : `Hej ${user.fullName.split(" ")[0]}!`}
         </h1>
         <div className="mt-6 border-b border-border">
           <SubNav items={memberNav} label="Mina sidor" />

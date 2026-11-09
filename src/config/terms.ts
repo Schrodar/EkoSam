@@ -36,6 +36,8 @@ export const terms = {
   /** Numret medlemmen loggar in med – föreningens eget nummer. */
   unitNumber: "fastighetsnummer",
   UnitNumber: "Fastighetsnummer",
+  /** "Logga in med fastighetsnumret". */
+  unitNumberDefinite: "fastighetsnumret",
   /** Den officiella beteckningen – det BrfStart kallar Lantmäteriets nummer. */
   officialNumber: "fastighetsbeteckning",
   OfficialNumber: "Fastighetsbeteckning",

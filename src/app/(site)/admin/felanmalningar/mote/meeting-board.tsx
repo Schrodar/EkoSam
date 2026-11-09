@@ -20,6 +20,7 @@ import {
   SubmitButton,
 } from "@/components/ui";
 import { cn, formatDate } from "@/lib/utils";
+import { unitName } from "@/config/terms";
 import { updateRequestAction } from "../actions";
 import { ReplyEmailButton, RequestFields } from "../request-fields";
 import { Timeline } from "../request-list";
@@ -245,7 +246,7 @@ function MeetingRow({
             {carriedOver ? <span>Från en tidigare månad</span> : null}
             {request.assignedTo ? <span>Utförs av {request.assignedTo}</span> : null}
             {request.reporterApartment ? (
-              <span>Lägenhet {request.reporterApartment}</span>
+              <span>{unitName(request.reporterApartment)}</span>
             ) : request.memberId ? (
               <span>Inloggad anmälare</span>
             ) : null}

@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { Field, FormError, Input, SubmitButton } from "@/components/ui";
+import { terms } from "@/config/terms";
 import { activateWithCodeAction, type ActivateState } from "./actions";
 
 /** Koden från brevet och ett lösenord – det är hela kontot. */
@@ -36,7 +37,7 @@ export function CodeForm() {
         label="Välj lösenord"
         htmlFor="password"
         required
-        hint="Minst 8 tecken. Har lägenheten redan ett konto får det det här lösenordet, och den gamla inloggningen slutar fungera."
+        hint={`Minst 8 tecken. Har ${terms.unitDefinite} redan ett konto får det det här lösenordet, och den gamla inloggningen slutar fungera.`}
       >
         <Input
           id="password"

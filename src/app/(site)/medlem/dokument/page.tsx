@@ -12,7 +12,7 @@ export default async function MemberDocumentsPage() {
         <h2 className="text-lg font-semibold">Dokument</h2>
         <p className="text-sm text-muted">
           Här ser du både föreningens offentliga dokument och interna dokument
-          som endast är tillgängliga för boende.
+          som endast är tillgängliga för medlemmar.
         </p>
       </div>
       <DocumentList documents={documents} showVisibility />

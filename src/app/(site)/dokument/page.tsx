@@ -16,7 +16,7 @@ export default async function DocumentsPage() {
     <Section>
       <Container>
         <PageIntro
-          eyebrow="För boende"
+          eyebrow="För medlemmar"
           title="Dokument"
           description="Föreningens offentliga dokument. Interna dokument som styrelseprotokoll finns på medlemssidorna."
         />
@@ -29,7 +29,7 @@ export default async function DocumentsPage() {
             Sidan är statisk, så det avgörs i webbläsaren. */}
         <GuestOnly>
           <p className="mt-6 text-sm text-muted">
-            Är du boende? Fler dokument finns när du är{" "}
+            Är du medlem? Fler dokument finns när du är{" "}
             <Link href="/logga-in" className="link-inline">
               inloggad
             </Link>

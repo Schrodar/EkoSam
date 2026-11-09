@@ -6,6 +6,7 @@ import { useFormStatus } from "react-dom";
 import { submitMaintenance, type MaintenanceState } from "./actions";
 import { HONEYPOT_FIELD } from "@/lib/form";
 import { useCurrentMember } from "@/lib/use-current-member";
+import { terms } from "@/config/terms";
 import {
   Button,
   Field,
@@ -40,7 +41,7 @@ export function MaintenanceForm({
   const { member: me } = useCurrentMember();
   const signedInAs = me
     ? me.apartmentNumber
-      ? `lägenhet ${me.apartmentNumber}`
+      ? `${terms.unit} ${me.apartmentNumber}`
       : me.fullName
     : null;
 

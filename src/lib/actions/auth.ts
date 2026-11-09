@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { getLoginEmailForApartment, getMemberByEmail } from "@/lib/data";
+import { terms } from "@/config/terms";
 import { safeNextPath } from "@/lib/utils";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -12,12 +13,13 @@ export interface AuthState {
 }
 
 const loginSchema = z.object({
-  identifier: z.string().trim().min(1, "Ange lägenhetsnummer eller e-post."),
+  identifier: z.string().trim().min(1, `Ange ${terms.unitNumber} eller e-post.`),
   password: z.string().min(1, "Ange ditt lösenord."),
 });
 
-/** Samma svar oavsett vad som var fel – annars går det att pröva fram vilka lägenheter som har konto. */
-const WRONG_LOGIN = "Fel lägenhetsnummer, e-post eller lösenord.";
+/** Samma svar oavsett vad som var fel – annars går det att pröva fram vilka fastigheter som har konto. */
+const WRONG_LOGIN = `Fel ${terms.unitNumber}, e-post eller lösenord.`;
+const NO_ACCOUNT_HELP = `Aktivera ${terms.unitGenitive} konto med koden i brevet, eller kontakta styrelsen.`;
 
 /**
  * Boende loggar in med lägenhetsnummer – lägenhetens konto har en intern
@@ -59,16 +61,14 @@ export async function loginAction(
   if (!member) {
     await supabase.auth.signOut();
     return {
-      error:
-        "Det finns inget konto för den här föreningen. Aktivera lägenhetens konto med koden i brevet, eller kontakta styrelsen.",
+      error: `Det finns inget konto för den här föreningen. ${NO_ACCOUNT_HELP}`,
     };
   }
   // Väntande och spärrade konton finns bara kvar från tiden med registrering.
   if (member.status !== "approved") {
     await supabase.auth.signOut();
     return {
-      error:
-        "Kontot är inte aktivt. Aktivera lägenhetens konto med koden i brevet, eller kontakta styrelsen.",
+      error: `Kontot är inte aktivt. ${NO_ACCOUNT_HELP}`,
     };
   }
 

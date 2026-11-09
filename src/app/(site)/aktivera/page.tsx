@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getActivation } from "@/lib/data";
 import { Card, CardBody, Container, Section } from "@/components/ui";
+import { terms } from "@/config/terms";
 import { ActivateForm } from "./activate-form";
 import { CodeForm } from "./code-form";
 
@@ -27,7 +28,7 @@ function CodeActivation() {
         </h1>
         <p className="mt-2 text-center text-sm text-muted">
           Skriv koden från brevet och välj ett lösenord. Sedan loggar du in med
-          lägenhetsnumret och lösenordet.
+          {` ${terms.unitNumberDefinite} `}och lösenordet.
         </p>
         <Card className="mt-6">
           <CardBody>
@@ -36,7 +37,7 @@ function CodeActivation() {
         </Card>
         <p className="mt-4 text-center text-xs text-muted">
           Glömt lösenordet? Använd koden igen. Har ni tappat brevet får
-          lägenheten en ny kod – kontakta styrelsen.
+          {` ${terms.unitDefinite} `}en ny kod – kontakta styrelsen.
         </p>
       </Container>
     </Section>
@@ -70,7 +71,7 @@ export default async function ActivatePage({
             <p className="mt-2 text-center text-sm text-muted">
               {invitation.role === "admin"
                 ? `Du har bjudits in som styrelseadmin. ${step}, så kommer du direkt till adminpanelen.`
-                : `Du har bjudits in som boende. ${step}, så kommer du direkt till Mina sidor.`}
+                : `Du har bjudits in som medlem. ${step}, så kommer du direkt till Mina sidor.`}
             </p>
             <Card className="mt-6">
               <CardBody>

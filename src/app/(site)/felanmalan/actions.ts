@@ -5,6 +5,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { createMaintenanceRequest } from "@/lib/data";
 import { notifyMaintenance } from "@/lib/email";
 import { HONEYPOT_FIELD } from "@/lib/form";
+import { unitName } from "@/config/terms";
 
 export interface MaintenanceState {
   error?: string;
@@ -71,12 +72,12 @@ export async function submitMaintenance(
     };
   }
 
-  // Lägenhetens konto har ingen e-post. Lägenheten sparas som namn på ärendet,
+  // Fastighetens konto har ingen e-post. Fastigheten sparas som namn på ärendet,
   // så att styrelsen ser varifrån det kom även efter ett ägarbyte, då kontot
   // raderas och kopplingen till ärendet försvinner.
   const contact = user
     ? user.apartmentNumber
-      ? { name: `Lägenhet ${user.apartmentNumber}`, email: "" }
+      ? { name: unitName(user.apartmentNumber), email: "" }
       : { name: user.fullName, email: user.email }
     : { name: "", email: "", ...parsed.data };
 

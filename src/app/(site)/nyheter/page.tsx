@@ -17,7 +17,7 @@ export default async function NewsPage() {
         <PageIntro
           eyebrow="Aktuellt"
           title="Nyheter"
-          description="Aktuellt från styrelsen och information till boende."
+          description="Aktuellt från styrelsen och information till medlemmarna."
         />
 
         {news.length > 0 ? (
@@ -30,7 +30,7 @@ export default async function NewsPage() {
           <div className="mt-12 rounded-card border border-border bg-surface/60 px-6 py-14 text-center sm:mt-16">
             <p className="title-card">Inga nyheter ännu</p>
             <p className="mt-2 text-sm text-muted">
-              Styrelsens nyheter och information till boende visas här.
+              Styrelsens nyheter och information till medlemmarna visas här.
             </p>
           </div>
         )}

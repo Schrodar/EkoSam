@@ -34,7 +34,7 @@ export default async function ContactPage() {
   return (
     <Section>
       <Container>
-        <PageIntro eyebrow="För boende" title="Kontakt" description={`Så här når du ${contacts}.`} />
+        <PageIntro eyebrow="För medlemmar" title="Kontakt" description={`Så här når du ${contacts}.`} />
 
         <div className="mt-12 grid gap-8 md:grid-cols-2">
           <Card>

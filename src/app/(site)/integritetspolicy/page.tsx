@@ -45,8 +45,10 @@ export default async function PrivacyPage() {
           <h2>Vilka uppgifter vi behandlar</h2>
           <ul>
             <li>
-              <strong>Medlemskonton:</strong> namn, e-postadress och
-              lägenhetsnummer för att ge boende åtkomst till medlemssidorna.
+              <strong>Medlemskonton:</strong> varje fastighet har ett konto med
+              fastighetens nummer, utan namn och e-post, för att ge medlemmarna
+              åtkomst till medlemssidorna. Styrelseledamöter med ett personligt
+              konto har namn och e-postadress.
             </li>
             <li>
               <strong>Felanmälningar:</strong> namn, kontaktuppgifter och
@@ -57,7 +59,7 @@ export default async function PrivacyPage() {
           <h2>Ändamål och laglig grund</h2>
           <p>
             Uppgifterna används endast för att förvalta föreningen och ge service
-            till boende. Laglig grund är berättigat intresse samt fullgörande av
+            till medlemmarna. Laglig grund är berättigat intresse samt fullgörande av
             föreningens åtaganden gentemot medlemmarna.
           </p>
 

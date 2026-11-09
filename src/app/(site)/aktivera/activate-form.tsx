@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { Button, Field, FormError, Input } from "@/components/ui";
+import { terms } from "@/config/terms";
 import type { ActivationMode } from "@/lib/data/invitations";
 import { activateAction, type ActivateState } from "./actions";
 
@@ -51,7 +52,7 @@ export function ActivateForm({
         />
       </Field>
       {isAdmin ? null : (
-        <Field label="Lägenhetsnummer" htmlFor="apartment">
+        <Field label={terms.UnitNumber} htmlFor="apartment">
           <Input id="apartment" name="apartment" defaultValue={apartment} />
         </Field>
       )}
