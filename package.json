@@ -1,5 +1,5 @@
 {
-  "name": "generisk-brf-sida",
+  "name": "ekosam",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -10,10 +10,6 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "postinstall": "prisma generate",
-    "db:push": "prisma db push",
-    "db:migrate": "prisma migrate dev",
-    "db:deploy": "prisma migrate deploy",
-    "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
     "admin:invite": "tsx scripts/invite-admin.ts",
     "support:link": "tsx scripts/support-link.ts",
@@ -24,9 +20,6 @@
     "storage:setup": "tsx scripts/setup-storage.ts",
     "maintenance:number": "tsx scripts/number-maintenance-requests.ts",
     "contacts:migrate": "tsx scripts/migrate-contacts.ts"
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

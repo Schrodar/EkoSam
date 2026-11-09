@@ -44,11 +44,37 @@ const hero: HeroBackground = {
   // image: "/images/hero.webp",
 };
 
+/**
+ * Funktioner från BrfStart som en samfällighet inte använder. En avstängd
+ * funktion har varken flikar, länkar eller sidor – adresserna ger 404.
+ * Koden ligger kvar, så att strömbrytarna kan flytta till BrfStart som en del
+ * av föreningstypen (se src/config/terms.ts).
+ */
+export interface SiteFeatures {
+  /** Till salu: annonser för bostäder som säljs, och Sälja bostaden på Mina sidor. */
+  listings: boolean;
+  /** Trapphustavlor: skärmar med anslag i trapphusen. */
+  displays: boolean;
+  /** Planritningar för varje bostad, och sidan Min lägenhet på Mina sidor. */
+  floorPlans: boolean;
+  /** För mäklare: fakta för mäklare och köpare. */
+  brokerPage: boolean;
+}
+
+const features: SiteFeatures = {
+  listings: false,
+  displays: false,
+  floorPlans: false,
+  brokerPage: false,
+};
+
 export const siteConfig = {
   /** Kort beskrivning – visas som ingress i sidomenyn. */
-  description: "Information för boende, besökare och blivande medlemmar.",
+  description: "Information för medlemmar och besökare.",
 
   hero,
+
+  features,
 
   logo: {
     /** Primär logotyp (mörk, för ljus bakgrund). */
@@ -67,7 +93,10 @@ export const siteConfig = {
   },
 
   seo: {
-    /** Sajtens adress – bas för absoluta länkar i metadata och mejl. */
+    /**
+     * Sajtens adress – bas för absoluta länkar i metadata och mejl.
+     * Platshållare: byts mot samfällighetens domän.
+     */
     siteUrl: "https://www.exempelgarden.se",
   },
 } as const;

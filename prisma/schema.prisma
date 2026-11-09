@@ -1,3 +1,12 @@
+// ⚠ KOPIA – redigera inte här.
+//
+// Källa: BrfStart (Schrodar/BrfStart, remoten upstream). Schemat följer med
+// när EkoSam hämtar uppdateringar: git fetch upstream && git merge upstream/main.
+//
+// EkoSam kör ALDRIG `prisma db push` eller `prisma migrate`. Databasen delas med
+// BrfStart och de andra föreningarna, och en push härifrån skulle kunna skriva
+// över deras data. Därför finns inga db-skript i package.json.
+
 // Datamodell för generisk BRF-sida (multi-tenant).
 //
 // Databas: Supabase Postgres (delad mellan flera föreningar).

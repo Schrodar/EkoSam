@@ -1,8 +1,29 @@
-# Generisk BRF-sida
+# EkoSam – hemsida för en samfällighetsförening
 
-Boilerplate för bostadsrättsföreningars hemsidor. Forka repot, byt föreningens
-uppgifter och färger, och du har en färdig sida med publik information,
-medlemsområde och adminpanel där styrelsen sköter allt innehåll själv.
+EkoSam är [BrfStart](https://github.com/Schrodar/BrfStart) anpassad för en
+samfällighetsförening: publik information, Mina sidor för varje fastighet och
+en adminpanel där styrelsen sköter innehållet själv.
+
+**Skillnaderna mot BrfStart** samlas på två ställen, så att de kan flyttas
+till BrfStart som en föreningstyp när EkoSam är klar:
+
+- [`src/config/terms.ts`](src/config/terms.ts) – orden: fastighet i stället
+  för lägenhet, område i stället för hus, medlemmar i stället för boende.
+- `features` i [`src/config/siteConfig.ts`](src/config/siteConfig.ts) –
+  avstängda funktioner: Till salu, Trapphustavlor, Planritningar och För
+  mäklare.
+
+**Databasen delas med BrfStart.** EkoSam är en egen förening
+(`ASSOCIATION_SLUG`) i samma databas och samma Supabase Auth. Schemat ägs av
+BrfStart: EkoSam kör aldrig `prisma db push` eller `prisma migrate`, och har
+därför inga db-skript. Uppdateringar, även av schemat, hämtas från BrfStart:
+
+```bash
+git fetch upstream
+git merge upstream/main
+```
+
+Resten av README är BrfStarts och beskriver grunden.
 
 > **Status:** Databas (**Supabase Postgres via Prisma**) och inloggning
 > (**Supabase Auth**) är inkopplade, och filer (foton, planritningar, dokument)
@@ -44,12 +65,11 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY="sb_publishable_…"   # publik
 SUPABASE_SERVICE_ROLE_KEY="sb_secret_…"            # hemlig, endast server
 ```
 
-Sätt upp buckets, tabeller och föreningen (med demoinnehåll), starta sedan:
+Tabellerna och Storage-buckets finns redan i den delade databasen. Skapa
+föreningen en gång och starta sedan:
 
 ```bash
-npm run storage:setup   # Storage-buckets (en gång per projekt)
-npm run db:push         # skapar tabellerna
-npm run db:seed         # skapar föreningen (ASSOCIATION_SLUG) + demoinnehåll
+npm run association:create -- ekosam "Föreningens namn"   # egen förening i databasen
 npm run dev
 ```
 
@@ -251,8 +271,7 @@ applikationens *Resource Limits*.
    `NEXT_PUBLIC_HERO_VIDEO` i deployens env (läses vid bygget). Bilden tonar
    fram med en långsam zoom, och toningen över bild och film följer
    `--color-brand-900`.
-5. **Startinnehåll:** ändra innehållet direkt i adminpanelen, eller redigera
-   seed-datan i [`prisma/seed.ts`](prisma/seed.ts) och kör om `npm run db:seed`.
+5. **Startinnehåll:** ändra innehållet direkt i adminpanelen.
 
 ## Projektstruktur
 
@@ -278,7 +297,7 @@ src/
     types.ts             Domäntyper (datalagret mappar Prisma-rader hit)
 prisma/
   schema.prisma          Datamodell (speglar src/lib/types.ts)
-  seed.ts                Demoinnehåll (npm run db:seed)
+  seed.ts                BrfStarts demoinnehåll – körs inte i EkoSam
 scripts/
   invite-admin.ts        Bjuder in en styrelse-admin (npm run admin:invite)
 ```
@@ -303,10 +322,8 @@ npm run build      # produktionsbygge (prisma generate + next build)
 npm run start      # kör produktionsbygget
 npm run lint       # ESLint
 npm run typecheck  # TypeScript utan att bygga
-npm run db:push    # synka schema till databasen (utan migrationsfiler)
-npm run db:migrate # skapa/apply migration (dev)
-npm run db:seed    # seeda demoinnehåll
-npm run db:studio  # Prisma Studio (bläddra i datan)
+npm run db:studio  # Prisma Studio (bläddra i datan) – schemat ändras bara i BrfStart
+npm run association:create  # skapa föreningen i den delade databasen
 npm run admin:invite    # bjud in en styrelseadmin (engångslänk)
 npm run support:link    # supportlänk till en förenings adminpanel
 npm run members:legacy  # ta bort gamla personliga boendekonton (torrkörning utan --bekrafta)
