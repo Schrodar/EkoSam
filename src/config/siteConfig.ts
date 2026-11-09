@@ -20,7 +20,14 @@
  * Färger/typsnitt ändras i src/app/globals.css.
  */
 
+import { heroReel, type HeroReelConfig } from "./hero-reel";
+
 export interface HeroBackground {
+  /**
+   * Filmrulle: flera klipp som tonar över i varandra (src/config/hero-reel.ts).
+   * Går före både film och bild.
+   */
+  reel?: HeroReelConfig;
   /** Bakgrundsfilm. Går före bilden, som då blir poster tills filmen laddat. */
   video?: string;
   /** Bakgrundsbild. Visas när ingen film används. */
@@ -40,6 +47,8 @@ export interface HeroBackground {
  * Bilden läggs i public/images/. Raden och filen är sajtspecifika – se README.
  */
 const hero: HeroBackground = {
+  // EkoSam: vallmoäng, skog och solnedgång som tonar över i varandra.
+  reel: heroReel,
   video: process.env.NEXT_PUBLIC_HERO_VIDEO,
   // image: "/images/hero.webp",
 };

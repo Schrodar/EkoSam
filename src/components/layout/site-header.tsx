@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import { TransitionLink } from "@/components/page-transition/TransitionLink";
 import { NavDrawer } from "@/components/layout/nav-drawer";
 import { AccountButton, AuthButton } from "@/components/layout/auth-button";
+import { HeroReel } from "@/components/layout/hero-reel";
 import { AssociationLogo } from "@/components/association";
 import { siteConfig } from "@/config/siteConfig";
 import type { AssociationProfile } from "@/lib/types";
@@ -61,9 +62,12 @@ export function SiteHeader({
 
   return (
     <header className="relative isolate flex min-h-svh overflow-hidden bg-brand-800 text-white">
-      {/* Bakgrund (helskärm), vald i siteConfig.hero: film före bild. brand-800
-          på headern syns tills den laddat – och hela tiden när ingen är vald. */}
-      {hero.video ? (
+      {/* Bakgrund (helskärm), vald i siteConfig.hero: filmrulle före film före
+          bild. brand-800 på headern syns tills den laddat – och hela tiden när
+          ingen är vald. */}
+      {hero.reel ? (
+        <HeroReel reel={hero.reel} />
+      ) : hero.video ? (
         <video
           aria-hidden="true"
           className="absolute inset-0 h-full w-full object-cover"

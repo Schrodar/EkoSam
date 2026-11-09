@@ -355,6 +355,18 @@ body {
   }
 }
 
+/* Hero: filmrullens lager (src/components/layout/hero-reel.tsx). Bildpositionen
+   kommer från src/config/hero-reel.ts – mobil under 768 px, annars bred skärm.
+   Ingen zoom och inga andra rörelser: bara klippen och toningen mellan dem. */
+.hero-reel-layer {
+  object-position: var(--hero-pos-mobile, 50% 50%);
+}
+@media (min-width: 768px) {
+  .hero-reel-layer {
+    object-position: var(--hero-pos, 50% 50%);
+  }
+}
+
 /* Hero: toning i föreningens egen färg i stället för svart, så att bildens
    ljus får vara kvar i mitten. Djup nedtill där texten ligger, lätt upptill
    för menyraden och en svag slöja över allt som binder ihop tonerna. Följer
