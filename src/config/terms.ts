@@ -33,6 +33,8 @@ export const terms = {
   UnitGenitive: "Fastighetens",
   /** Sammansatt: "fastighetskonto". */
   unitAccount: "fastighetskonto",
+  /** "någon på fastigheten" – BrfStart säger "i lägenheten". */
+  atUnit: "på fastigheten",
   /** Numret medlemmen loggar in med – föreningens eget nummer. */
   unitNumber: "fastighetsnummer",
   UnitNumber: "Fastighetsnummer",
@@ -47,9 +49,11 @@ export const terms = {
   group: "område",
   Group: "Område",
   groupDefinite: "området",
+  GroupDefinite: "Området",
   groups: "områden",
   Groups: "Områden",
-  groupHint: "t.ex. en gata eller en radhuslänga",
+  /** Hjälptext när ett område läggs upp. */
+  groupHint: "T.ex. en gata eller en radhuslänga.",
 
   /** De som hör till föreningen – det BrfStart kallar boende. */
   members: "medlemmar",

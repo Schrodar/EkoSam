@@ -9,6 +9,7 @@ import {
   type ButtonVariant,
 } from "@/components/ui";
 import type { AccessLetter } from "@/lib/data/access-codes";
+import { terms, unitName } from "@/config/terms";
 import type { LetterState } from "./letter-state";
 
 type LetterAction = (prev: LetterState, formData: FormData) => Promise<LetterState>;
@@ -208,21 +209,22 @@ function Letter({
           <p className="text-lg font-semibold">{sender.name}</p>
         </div>
         <div className="text-right text-sm">
-          <p className="font-semibold">Lägenhet {letter.number}</p>
+          <p className="font-semibold">{unitName(letter.number)}</p>
           {letter.standardNumber ? (
-            <p>Lantmäteriets nr {letter.standardNumber}</p>
+            <p>
+              {terms.OfficialNumber} {letter.standardNumber}
+            </p>
           ) : null}
           {where ? <p>{where}</p> : null}
         </div>
       </header>
 
       <h2 className="mt-8 text-2xl font-semibold tracking-tight">
-        Ert konto på föreningens hemsida
+        Ert konto på {terms.associationGenitive} hemsida
       </h2>
       <p className="mt-3">
-        Varje lägenhet har ett eget konto på hemsidan. Där gör och följer ni
-        felanmälningar, läser föreningens interna dokument och sköter
-        uppgifterna om lägenheten.
+        Varje {terms.unit} har ett eget konto på hemsidan. Där gör och följer ni
+        felanmälningar och läser föreningens interna dokument.
       </p>
 
       <h3 className="mt-6 font-semibold">Så aktiverar ni kontot</h3>
@@ -232,21 +234,23 @@ function Letter({
         </li>
         <li>Skriv in koden nedan och välj ett lösenord.</li>
         <li>
-          Logga sedan in på <strong>{host}</strong> med lägenhetsnummer{" "}
+          Logga sedan in på <strong>{host}</strong> med {terms.unitNumber}{" "}
           <strong>{letter.number}</strong> och lösenordet.
         </li>
       </ol>
 
       <div className="my-8 rounded-xl border-2 border-neutral-900 px-6 py-5 text-center">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-600">
-          Lägenhetens kod
+          {terms.UnitGenitive} kod
         </p>
         <p className="mt-2 font-mono text-3xl font-bold tracking-[0.15em]">
           {letter.code}
         </p>
       </div>
 
-      <h3 className="font-semibold">Spara brevet – koden är lägenhetens nyckel</h3>
+      <h3 className="font-semibold">
+        Spara brevet – koden är {terms.unitGenitive} nyckel
+      </h3>
       <ul className="mt-2 list-disc space-y-1.5 pl-5">
         <li>
           Glömt lösenordet? Använd koden igen och välj ett nytt. Det gamla
@@ -261,9 +265,12 @@ function Letter({
               på <strong>{sender.contactEmail}</strong>
             </>
           ) : null}
-          , så får lägenheten en ny kod i ett nytt brev.
+          , så får {terms.unitDefinite} en ny kod i ett nytt brev.
         </li>
-        <li>Säljer ni lägenheten får köparen en ny kod, och den här slutar gälla.</li>
+        <li>
+          Säljer ni {terms.unitDefinite} får köparen en ny kod, och den här
+          slutar gälla.
+        </li>
       </ul>
     </article>
   );

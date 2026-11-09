@@ -9,6 +9,7 @@ import {
   createAccessCodes,
   createApartmentsInBulk,
   createBuilding,
+  createPropertiesInBulk,
   deleteApartment,
   deleteApartmentAccount,
   deleteBuilding,
@@ -33,6 +34,7 @@ import {
 } from "@/lib/storage";
 import type { FormState } from "@/lib/form";
 import { siteOrigin } from "@/lib/site-origin";
+import { terms } from "@/config/terms";
 import type { LetterState } from "./letter-state";
 
 /*
@@ -75,10 +77,10 @@ export async function updateFactsAction(
     description: str(fd, "description"),
   });
   if (!result.ok) return { error: result.error };
-  // Lägenhetsnumret är inloggningen – kontots namn följer med.
+  // Fastighetsnumret är inloggningen – kontots namn följer med.
   await syncApartmentAccountName(id);
   revalidate(id);
-  return { success: "Lägenhetsfakta sparad." };
+  return { success: `${terms.UnitGenitive} uppgifter sparades.` };
 }
 
 export async function uploadFloorPlanAction(
@@ -127,7 +129,7 @@ export async function deleteApartmentAction(fd: FormData): Promise<void> {
 // ---------------------------------------------------------------------------
 
 const buildingSchema = z.object({
-  name: z.string().min(1, "Ange ett namn på huset."),
+  name: z.string().min(1, `Ange ett namn på ${terms.groupDefinite}.`),
   address: z.string().default(""),
   numberStart: z.string().default("1"),
   numberTopDown: z.boolean().default(false),
@@ -175,7 +177,7 @@ export async function updateBuildingAction(
   const result = await updateBuilding(id, parsed.data);
   if (!result.ok) return { error: result.error };
   revalidateBuildings(id);
-  return { success: "Huset sparades." };
+  return { success: `${terms.GroupDefinite} sparades.` };
 }
 
 export async function deleteBuildingAction(
@@ -207,8 +209,8 @@ export async function deleteBuildingAction(
   return {
     success:
       result.apartments > 0
-        ? `Huset och ${result.apartments} ${result.apartments === 1 ? "lägenhet" : "lägenheter"} togs bort.`
-        : "Huset togs bort.",
+        ? `${terms.GroupDefinite} och ${result.apartments} ${result.apartments === 1 ? terms.unit : terms.units} togs bort.`
+        : `${terms.GroupDefinite} togs bort.`,
   };
 }
 
@@ -290,6 +292,53 @@ export async function bulkAddApartmentsAction(
   };
 }
 
+const propertyBulkSchema = z.object({
+  buildingId: z.string().min(1),
+  start: z
+    .string()
+    .regex(/^\d+$/, "Startnumret får bara innehålla siffror."),
+  count: z.coerce
+    .number()
+    .int(`Ange ett helt antal ${terms.units}.`)
+    .min(1, `Ange minst en ${terms.unit}.`)
+    .max(300, `Högst 300 ${terms.units} på en gång.`),
+});
+
+/**
+ * EkoSam: fastigheter i följd i ett område – utan våningar och
+ * lantmäterinummer. Fastighetsbeteckningen skrivs in per fastighet efteråt.
+ */
+export async function bulkAddPropertiesAction(
+  _prev: FormState,
+  fd: FormData,
+): Promise<FormState> {
+  await requireSupport();
+  const parsed = propertyBulkSchema.safeParse({
+    buildingId: fd.get("buildingId"),
+    start: String(fd.get("start") ?? ""),
+    count: fd.get("count"),
+  });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Kontrollera fälten." };
+  }
+
+  const result = await createPropertiesInBulk(parsed.data);
+  if (!result.ok) return { error: result.error };
+  revalidateBuildings(parsed.data.buildingId);
+
+  const { created, skipped } = result.result;
+  const counted = (n: number) => `${n} ${n === 1 ? terms.unit : terms.units}`;
+  if (created === 0) {
+    return { error: `Inga nya ${terms.units} – alla nummer fanns redan.` };
+  }
+  return {
+    success:
+      skipped.length > 0
+        ? `${counted(created)} lades till. ${skipped.length} hoppades över (fanns redan).`
+        : `${counted(created)} lades till.`,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Koder och brev
 // ---------------------------------------------------------------------------
@@ -321,8 +370,8 @@ export async function createCodesAction(
   if (ids.length === 0) {
     return {
       error: onlyMissing
-        ? "Alla lägenheter här har redan en kod."
-        : "Det finns inga lägenheter här ännu.",
+        ? `Alla ${terms.units} här har redan en kod.`
+        : `Det finns inga ${terms.units} här ännu.`,
     };
   }
 
@@ -339,7 +388,7 @@ export async function newCodeAction(
   await requireSupport();
   const id = aptId(fd);
   const letters = await createAccessCodes([id]);
-  if (letters.length === 0) return { error: "Lägenheten hittades inte." };
+  if (letters.length === 0) return { error: `${terms.UnitDefinite} hittades inte.` };
   revalidate(id);
   return { letters, origin: await siteOrigin() };
 }
@@ -357,7 +406,7 @@ export async function changeOwnerAction(
   const id = aptId(fd);
   await endApartmentOwnership(id);
   const letters = await createAccessCodes([id]);
-  if (letters.length === 0) return { error: "Lägenheten hittades inte." };
+  if (letters.length === 0) return { error: `${terms.UnitDefinite} hittades inte.` };
   revalidatePath("/admin");
   revalidatePath("/admin/till-salu");
   revalidate(id);

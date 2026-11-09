@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { updateAssociationInfoAction } from "./actions";
 import type { FormState } from "@/lib/form";
 import type { AssociationInfo } from "@/lib/types";
+import { terms } from "@/config/terms";
 import {
   Field,
   FormSuccess,
@@ -12,6 +13,11 @@ import {
   Textarea,
 } from "@/components/ui";
 
+/**
+ * EkoSam: samfällighetens fakta. Mark, uppvärmning, tvätt, energiklass och
+ * husdjur gäller varje fastighet för sig och visas inte; fälten skickas dolda
+ * med sina värden, så att inget som redan finns skrivs över.
+ */
 export function InfoForm({ info }: { info: AssociationInfo }) {
   const [state, action] = useActionState<FormState, FormData>(
     updateAssociationInfoAction,
@@ -21,9 +27,14 @@ export function InfoForm({ info }: { info: AssociationInfo }) {
   return (
     <form action={action} className="space-y-6">
       {state.success ? <FormSuccess>{state.success}</FormSuccess> : null}
+      <input type="hidden" name="landOwnership" value={info.landOwnership} />
+      <input type="hidden" name="heating" value={info.heating} />
+      <input type="hidden" name="laundry" value={info.laundry} />
+      <input type="hidden" name="energyClass" value={info.energyClass} />
+      <input type="hidden" name="pets" value={info.pets} />
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Byggår" htmlFor="builtYear">
+        <Field label="Bildad (år)" htmlFor="builtYear">
           <Input
             id="builtYear"
             name="builtYear"
@@ -31,7 +42,7 @@ export function InfoForm({ info }: { info: AssociationInfo }) {
             defaultValue={info.builtYear}
           />
         </Field>
-        <Field label="Antal lägenheter" htmlFor="apartments">
+        <Field label={`Antal ${terms.units}`} htmlFor="apartments">
           <Input
             id="apartments"
             name="apartments"
@@ -39,22 +50,15 @@ export function InfoForm({ info }: { info: AssociationInfo }) {
             defaultValue={info.apartments}
           />
         </Field>
-        <Field label="Föreningsform" htmlFor="associationType">
+        <Field label="Föreningsform" htmlFor="associationType" hint="T.ex. Samfällighetsförening.">
           <Input
             id="associationType"
             name="associationType"
             defaultValue={info.associationType}
           />
         </Field>
-        <Field label="Mark" htmlFor="landOwnership">
-          <Input
-            id="landOwnership"
-            name="landOwnership"
-            defaultValue={info.landOwnership}
-          />
-        </Field>
-        <Field label="Uppvärmning" htmlFor="heating">
-          <Input id="heating" name="heating" defaultValue={info.heating} />
+        <Field label="Parkering" htmlFor="parking">
+          <Input id="parking" name="parking" defaultValue={info.parking} />
         </Field>
         <Field label="Bredband/TV" htmlFor="broadband">
           <Input
@@ -63,32 +67,21 @@ export function InfoForm({ info }: { info: AssociationInfo }) {
             defaultValue={info.broadband}
           />
         </Field>
-        <Field label="Parkering" htmlFor="parking">
-          <Input id="parking" name="parking" defaultValue={info.parking} />
-        </Field>
-        <Field label="Tvätt" htmlFor="laundry">
-          <Input id="laundry" name="laundry" defaultValue={info.laundry} />
-        </Field>
-        <Field label="Gemensamma utrymmen" htmlFor="commonAreas">
-          <Input
-            id="commonAreas"
-            name="commonAreas"
-            defaultValue={info.commonAreas}
-          />
-        </Field>
-        <Field label="Energiklass" htmlFor="energyClass">
-          <Input
-            id="energyClass"
-            name="energyClass"
-            defaultValue={info.energyClass}
-          />
-        </Field>
       </div>
 
-      <Field label="Husdjur / andrahandsuthyrning" htmlFor="pets">
-        <Textarea id="pets" name="pets" defaultValue={info.pets} className="min-h-20" />
+      <Field
+        label="Gemensamma anläggningar"
+        htmlFor="commonAreas"
+        hint="T.ex. vägar, belysning, lekplats och grönytor."
+      >
+        <Textarea
+          id="commonAreas"
+          name="commonAreas"
+          defaultValue={info.commonAreas}
+          className="min-h-20"
+        />
       </Field>
-      <Field label="Avgift – vad ingår" htmlFor="feesInfo">
+      <Field label="Avgiften – vad den täcker" htmlFor="feesInfo">
         <Textarea
           id="feesInfo"
           name="feesInfo"
@@ -105,7 +98,7 @@ export function InfoForm({ info }: { info: AssociationInfo }) {
         />
       </Field>
       <Field
-        label="Genomförda renoveringar"
+        label="Genomfört underhåll"
         htmlFor="renovationsDone"
         hint="En per rad."
       >

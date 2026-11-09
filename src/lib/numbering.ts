@@ -83,12 +83,16 @@ export function floorLabel(floor: number): string {
   return `Källarplan ${Math.abs(floor)}`;
 }
 
-/** Visningsformatet. Utan standardnummer visas bara föreningens nummer. */
+/**
+ * Visningsformatet. Utan standardnummer visas bara föreningens nummer.
+ * EkoSam: standardnumret är fastighetsbeteckningen, så numret visas som
+ * "23 (Ekoby 1:23)" i stället för BrfStarts "23/1101".
+ */
 export function formatApartmentNumber(
   number: string,
   standardNumber: string | null | undefined,
 ): string {
-  return standardNumber ? `${number}/${standardNumber}` : number;
+  return standardNumber ? `${number} (${standardNumber})` : number;
 }
 
 /**

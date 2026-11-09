@@ -5,6 +5,7 @@ import type {
 import type { Apartment, ApartmentPhoto } from "@/lib/types";
 import { getTenantDb } from "@/lib/tenant";
 import { compareApartmentNumbers } from "@/lib/numbering";
+import { terms, unitName } from "@/config/terms";
 import {
   BUCKET_FLOORPLANS,
   BUCKET_PHOTOS,
@@ -264,7 +265,7 @@ export async function updateApartmentFacts(
 ): Promise<FactsResult> {
   const { db } = await getTenantDb();
   const number = input.number.trim();
-  if (!number) return { ok: false, error: "Ange lägenhetsnummer." };
+  if (!number) return { ok: false, error: `Ange ${terms.unitNumber}.` };
 
   // Numret är unikt per förening – fånga krocken här så att den boende får ett
   // begripligt meddelande i stället för ett databasfel.
@@ -273,7 +274,7 @@ export async function updateApartmentFacts(
     select: { id: true },
   });
   if (clash) {
-    return { ok: false, error: `Lägenhet ${number} finns redan.` };
+    return { ok: false, error: `${unitName(number)} finns redan.` };
   }
 
   await db.apartment.updateMany({
@@ -494,11 +495,11 @@ export async function createApartment(
   input: CreateApartmentInput,
 ): Promise<CreateApartmentResult> {
   const number = input.number.trim();
-  if (!number) return { ok: false, error: "Ange lägenhetsnummer." };
+  if (!number) return { ok: false, error: `Ange ${terms.unitNumber}.` };
   const { db, associationId } = await getTenantDb();
   const existing = await db.apartment.findFirst({ where: { number } });
   if (existing) {
-    return { ok: false, error: "En lägenhet med det numret finns redan." };
+    return { ok: false, error: `En ${terms.unit} med det numret finns redan.` };
   }
   const building = input.buildingId
     ? await db.building.findFirst({ where: { id: input.buildingId } })

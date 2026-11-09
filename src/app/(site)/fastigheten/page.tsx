@@ -1,32 +1,33 @@
 import type { Metadata } from "next";
 import { getAssociationInfo } from "@/lib/data";
+import { terms } from "@/config/terms";
 import { Card, CardBody, Container, PageIntro, Section } from "@/components/ui";
 
+const DESCRIPTION = `Om ${terms.groupDefinite} och ${terms.associationGenitive} gemensamma anläggningar.`;
+
 export const metadata: Metadata = {
-  title: "Fastigheten",
-  description: "Om huset, gemensamma utrymmen och vad som ingår i boendet.",
+  title: terms.GroupDefinite,
+  description: DESCRIPTION,
 };
 
 /**
- * Sidan var tidigare ett tomt skal med en text om att innehållet "fylls på av
- * styrelsen". Den visar nu fastighetsfälten ur Föreningsinfo och hoppar över
- * det som inte är ifyllt.
+ * EkoSam: sidan om området (BrfStart: Fastigheten). Den visar fälten ur
+ * Föreningsinfo som gäller en samfällighet och hoppar över det som inte är
+ * ifyllt. Uppvärmning, tvätt, energiklass och mark gäller varje fastighet för
+ * sig och visas inte.
  */
 export default async function FastighetenPage() {
   const info = await getAssociationInfo();
 
   const facts = [
-    { label: "Byggår", value: info.builtYear ? String(info.builtYear) : "" },
+    { label: "Bildad", value: info.builtYear ? String(info.builtYear) : "" },
     {
-      label: "Antal lägenheter",
+      label: `Antal ${terms.units}`,
       value: info.apartments ? String(info.apartments) : "",
     },
-    { label: "Uppvärmning", value: info.heating },
-    { label: "Bredband och TV", value: info.broadband },
+    { label: "Gemensamma anläggningar", value: info.commonAreas },
     { label: "Parkering", value: info.parking },
-    { label: "Tvätt", value: info.laundry },
-    { label: "Gemensamma utrymmen", value: info.commonAreas },
-    { label: "Energiklass", value: info.energyClass },
+    { label: "Bredband och TV", value: info.broadband },
   ].filter((f) => f.value);
 
   return (
@@ -34,15 +35,15 @@ export default async function FastighetenPage() {
       <Container>
         <PageIntro
           eyebrow="Om föreningen"
-          title="Fastigheten"
-          description="Om huset, gemensamma utrymmen och vad som ingår i boendet."
+          title={terms.GroupDefinite}
+          description={DESCRIPTION}
         />
 
         <div className="mt-12 max-w-2xl space-y-8">
           {facts.length === 0 ? (
             <Card>
               <CardBody className="py-6 text-sm text-muted">
-                Styrelsen har inte fyllt i uppgifter om fastigheten ännu.
+                Styrelsen har inte fyllt i uppgifter om {terms.groupDefinite} ännu.
               </CardBody>
             </Card>
           ) : (
@@ -70,7 +71,7 @@ export default async function FastighetenPage() {
           {info.renovationsDone.length > 0 ? (
             <Card>
               <CardBody>
-                <h2 className="title-card">Genomförda renoveringar</h2>
+                <h2 className="title-card">Genomfört underhåll</h2>
                 <ul className="mt-3 space-y-1.5 text-sm text-foreground">
                   {info.renovationsDone.map((item) => (
                     <li key={item} className="flex gap-2">

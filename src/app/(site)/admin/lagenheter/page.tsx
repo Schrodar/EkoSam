@@ -7,7 +7,8 @@ import {
   getUnassignedApartments,
 } from "@/lib/data";
 import type { BuildingWithCounts } from "@/lib/types";
-import { Badge, Card, CardBody, PageHeader } from "@/components/ui";
+import { terms } from "@/config/terms";
+import { Card, CardBody, PageHeader } from "@/components/ui";
 import { BuildingManager } from "./building-manager";
 import { CodeSection } from "./code-section";
 
@@ -16,24 +17,19 @@ function BuildingCard({ building }: { building: BuildingWithCounts }) {
     <Link href={`/admin/lagenheter/hus/${building.id}`}>
       <Card className="h-full transition-shadow hover:shadow-md">
         <CardBody className="space-y-2">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <p className="truncate font-semibold text-foreground">
-                {building.name}
-              </p>
-              {building.address ? (
-                <p className="truncate text-sm text-muted">{building.address}</p>
-              ) : null}
-            </div>
-            {building.forSaleCount > 0 ? (
-              <Badge tone="brand">{building.forSaleCount} till salu</Badge>
+          <div className="min-w-0">
+            <p className="truncate font-semibold text-foreground">
+              {building.name}
+            </p>
+            {building.address ? (
+              <p className="truncate text-sm text-muted">{building.address}</p>
             ) : null}
           </div>
           <p className="text-2xl font-bold tracking-tight text-foreground">
             {building.apartmentCount}
           </p>
           <p className="text-sm text-muted">
-            {building.apartmentCount === 1 ? "lägenhet" : "lägenheter"}
+            {building.apartmentCount === 1 ? terms.unit : terms.units}
           </p>
         </CardBody>
       </Card>
@@ -41,6 +37,7 @@ function BuildingCard({ building }: { building: BuildingWithCounts }) {
   );
 }
 
+/** EkoSam: registret över samfällighetens fastigheter, område för område. */
 export default async function AdminApartmentsPage() {
   await requireSupport();
   const [buildings, unassigned, apartments, profile] = await Promise.all([
@@ -56,17 +53,17 @@ export default async function AdminApartmentsPage() {
   return (
     <div className="space-y-10">
       <PageHeader
-        title="Lägenheter"
-        description={`Föreningens fastighet, hus för hus. ${total} ${
-          total === 1 ? "lägenhet" : "lägenheter"
+        title={terms.Units}
+        description={`${terms.Association}s ${terms.units}, ${terms.group} för ${terms.group}. ${total} ${
+          total === 1 ? terms.unit : terms.units
         } i registret. Bara du ser sidan, i supportläget.`}
       />
 
       {buildings.length === 0 && unassigned.length === 0 ? (
         <Card>
           <CardBody className="py-8 text-center text-sm text-muted">
-            Registret är tomt. Börja med att lägga till ett hus nedan – sedan
-            kan du fylla det med lägenheter på en gång.
+            Registret är tomt. Börja med att lägga till ett {terms.group} nedan –
+            sedan kan du fylla det med {terms.units} på en gång.
           </CardBody>
         </Card>
       ) : (
@@ -75,7 +72,7 @@ export default async function AdminApartmentsPage() {
             <BuildingCard key={b.id} building={b} />
           ))}
 
-          {/* Lägenheter utan hus. Kortet visas bara när det finns några. */}
+          {/* Fastigheter utan område. Kortet visas bara när det finns några. */}
           {unassigned.length > 0 ? (
             <Link href="/admin/lagenheter/hus/ej-placerade">
               <Card className="h-full border-dashed transition-shadow hover:shadow-md">
@@ -85,7 +82,7 @@ export default async function AdminApartmentsPage() {
                     {unassigned.length}
                   </p>
                   <p className="text-sm text-muted">
-                    saknar hus – placera dem här
+                    saknar {terms.group} – placera dem här
                   </p>
                 </CardBody>
               </Card>
@@ -102,7 +99,7 @@ export default async function AdminApartmentsPage() {
       />
 
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold">Hus</h2>
+        <h2 className="text-lg font-semibold">{terms.Groups}</h2>
         <BuildingManager buildings={buildings} />
       </section>
     </div>

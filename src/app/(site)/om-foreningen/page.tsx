@@ -11,6 +11,8 @@ import { publishedFigures } from "@/lib/key-figures";
 import { KeyFiguresSummary } from "@/components/key-figures";
 import { Container, PageIntro, Section } from "@/components/ui";
 import { Prose } from "@/components/prose";
+import { terms } from "@/config/terms";
+import { isEnabled } from "@/lib/features";
 
 export const metadata: Metadata = {
   title: "Om föreningen",
@@ -34,20 +36,19 @@ export default async function AboutPage() {
     getAssociationProfile(),
     getEconomyFigures(),
   ]);
-  const figures = publishedFigures(economy);
+  // EkoSam: bostadsrätternas nyckeltal gäller inte en samfällighet.
+  const figures = isEnabled("keyFigures") ? publishedFigures(economy) : [];
 
   const facts: { label: string; value: string }[] = [
-    { label: "Byggår", value: info.builtYear ? String(info.builtYear) : "" },
+    { label: "Bildad", value: info.builtYear ? String(info.builtYear) : "" },
     {
-      label: "Antal lägenheter",
+      label: `Antal ${terms.units}`,
       value: info.apartments ? String(info.apartments) : "",
     },
     { label: "Föreningsform", value: info.associationType },
-    { label: "Mark", value: info.landOwnership },
-    { label: "Uppvärmning", value: info.heating },
-    { label: "Bredband", value: info.broadband },
+    { label: "Gemensamma anläggningar", value: info.commonAreas },
     // Tom sträng och 0 betyder "inte ifyllt" – hellre ingen ruta än en ruta
-    // med nollor och tomma rader, precis som på Fastigheten och För mäklare.
+    // med nollor och tomma rader, precis som på sidan om området.
   ].filter((fact) => fact.value);
   const hasAside = facts.length > 0 || figures.length > 0;
 
@@ -92,11 +93,13 @@ export default async function AboutPage() {
                     href="/fastigheten"
                     className="link-more mt-5"
                   >
-                    Fler fakta om fastigheten <span aria-hidden="true" className="arrow">→</span>
+                    Fler fakta om {terms.groupDefinite} <span aria-hidden="true" className="arrow">→</span>
                   </Link>
                 </div>
               ) : null}
-              <KeyFiguresSummary figures={figures} fiscalYear={economy.fiscalYear} />
+              {figures.length > 0 ? (
+                <KeyFiguresSummary figures={figures} fiscalYear={economy.fiscalYear} />
+              ) : null}
             </aside>
           ) : null}
         </div>

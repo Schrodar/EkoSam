@@ -47,7 +47,9 @@ function adminNav(support: boolean): SubNavItem[] {
       children: [
         { href: "/admin/foreningsinfo", label: "Fakta" },
         { href: "/admin/foreningsinfo/kontakt", label: "Namn och kontakt" },
-        { href: "/admin/foreningsinfo/ekonomi", label: "Ekonomi" },
+        ...(isEnabled("keyFigures")
+          ? [{ href: "/admin/foreningsinfo/ekonomi", label: "Ekonomi" }]
+          : []),
         { href: "/admin/innehall", label: "Innehåll" },
       ],
     },

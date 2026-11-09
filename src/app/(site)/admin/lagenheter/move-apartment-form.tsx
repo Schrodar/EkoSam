@@ -2,6 +2,7 @@
 
 import { useTransition } from "react";
 import { Select } from "@/components/ui";
+import { terms } from "@/config/terms";
 import { moveApartmentAction } from "./actions";
 
 /**
@@ -21,7 +22,7 @@ export function MoveApartmentForm({
 
   return (
     <Select
-      aria-label="Flytta lägenheten till ett annat hus"
+      aria-label={`Flytta ${terms.unitDefinite} till ett annat ${terms.group}`}
       defaultValue={currentBuildingId ?? ""}
       disabled={pending}
       className="w-44 text-sm"

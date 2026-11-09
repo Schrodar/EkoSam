@@ -4,22 +4,28 @@ import { getAssociationInfo, getEconomyFigures } from "@/lib/data";
 import { publishedFigures } from "@/lib/key-figures";
 import { KeyFiguresCard } from "@/components/key-figures";
 import { Card, CardBody, Container, PageIntro, Section } from "@/components/ui";
+import { isEnabled } from "@/lib/features";
+
+const keyFigures = isEnabled("keyFigures");
 
 export const metadata: Metadata = {
   title: "Föreningens ekonomi",
-  description: "Föreningens nyckeltal, avgifter och underhåll.",
+  description: keyFigures
+    ? "Föreningens nyckeltal, avgifter och underhåll."
+    : "Föreningens avgift, ekonomi och underhåll.",
 };
 
 /**
  * Nyckeltalen (Admin → Ekonomi) och de ekonomirelaterade fälten ur
  * Föreningsinfo. Det som inte är ifyllt hoppas över – hellre kort än påhittad.
+ * EkoSam: bostadsrätternas nyckeltal är avstängda (siteConfig.features).
  */
 export default async function EkonomiPage() {
   const [info, economy] = await Promise.all([
     getAssociationInfo(),
     getEconomyFigures(),
   ]);
-  const figures = publishedFigures(economy);
+  const figures = keyFigures ? publishedFigures(economy) : [];
 
   const blocks = [
     { title: "Avgiften", body: info.feesInfo },
@@ -30,13 +36,19 @@ export default async function EkonomiPage() {
     <Section>
       <Container>
         <PageIntro
-          eyebrow="Köpa bostad"
+          eyebrow="Om föreningen"
           title="Föreningens ekonomi"
-          description="Nyckeltal, avgiftsnivå, vad som ingår och planerat underhåll."
+          description={
+            keyFigures
+              ? "Nyckeltal, avgiftsnivå, vad som ingår och planerat underhåll."
+              : "Avgiften, ekonomin i korthet och planerat underhåll."
+          }
         />
 
         <div className="mt-12 max-w-2xl space-y-8">
-          <KeyFiguresCard figures={figures} fiscalYear={economy.fiscalYear} />
+          {keyFigures ? (
+            <KeyFiguresCard figures={figures} fiscalYear={economy.fiscalYear} />
+          ) : null}
 
           {blocks.length === 0 && figures.length === 0 ? (
             <Card>

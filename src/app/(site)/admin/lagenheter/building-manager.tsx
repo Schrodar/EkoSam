@@ -4,6 +4,7 @@ import { useActionState, useEffect, useRef, useState, useTransition } from "reac
 import type { FormState } from "@/lib/form";
 import type { BuildingWithCounts } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { terms } from "@/config/terms";
 import {
   Field,
   FormError,
@@ -18,10 +19,16 @@ import {
   updateBuildingAction,
 } from "./actions";
 
+const countText = (count: number) =>
+  `${count} ${count === 1 ? terms.unit : terms.units}`;
+
 /**
- * Skapa, döp om, sortera och ta bort hus. Ordningen styr i vilken följd korten
- * visas i registret. Samma mönster som grupperna på styrelsesidan: dra för mus,
- * pilknappar för pekskärm och tangentbord.
+ * Skapa, döp om, sortera och ta bort områden. Ordningen styr i vilken följd
+ * korten visas i registret. Samma mönster som grupperna på styrelsesidan: dra
+ * för mus, pilknappar för pekskärm och tangentbord.
+ *
+ * EkoSam: områdena saknar våningar, så riktningen (uppifrån/nedifrån) som
+ * BrfStart har för husen finns inte här.
  */
 export function BuildingManager({ buildings }: { buildings: BuildingWithCounts[] }) {
   const [order, setOrder] = useState(buildings);
@@ -110,7 +117,7 @@ export function BuildingManager({ buildings }: { buildings: BuildingWithCounts[]
               <BuildingRowForm building={b} />
 
               <span className="ml-auto text-sm text-muted">
-                {b.apartmentCount} lgh
+                {countText(b.apartmentCount)}
               </span>
 
               <div className="flex items-center gap-1">
@@ -192,19 +199,10 @@ function BuildingRowForm({ building }: { building: BuildingWithCounts }) {
         name="numberStart"
         defaultValue={building.numberStart}
         aria-label={`Startnummer för ${building.name}`}
-        title="Första lägenhetsnumret vid massinläggning"
+        title={`Första ${terms.unitNumberDefinite} vid massinläggning`}
         inputMode="numeric"
         className="w-24"
       />
-      <label className="flex items-center gap-1.5 text-sm text-muted">
-        <input
-          type="checkbox"
-          name="numberTopDown"
-          defaultChecked={building.numberTopDown}
-          className="size-4 accent-brand-600"
-        />
-        Uppifrån
-      </label>
       <button type="submit" className="text-sm font-medium text-brand-700 hover:underline">
         Spara
       </button>
@@ -222,15 +220,13 @@ function DeleteBuildingButton({ building }: { building: BuildingWithCounts }) {
   );
   const count = building.apartmentCount;
 
-  // Raderingen tar med lägenheterna, deras planritningar och annonsfoton. Det
-  // går inte att ångra, så be om ett aktivt ja när det finns något att förlora.
+  // Raderingen tar med fastigheterna och deras konton. Det går inte att ångra,
+  // så be om ett aktivt ja när det finns något att förlora.
   function confirmDelete(e: React.FormEvent<HTMLFormElement>) {
     if (count === 0) return;
     const answer = window.confirm(
-      `Ta bort ${building.name} och ${count} ${count === 1 ? "lägenhet" : "lägenheter"}?
-
-` +
-        "Planritningar och annonsfoton raderas också. Det går inte att ångra.",
+      `Ta bort ${building.name} och ${countText(count)}?\n\n` +
+        `${terms.UnitsDefinite}s konton raderas också. Det går inte att ångra.`,
     );
     if (!answer) e.preventDefault();
   }
@@ -242,7 +238,7 @@ function DeleteBuildingButton({ building }: { building: BuildingWithCounts }) {
         aria-label={`Ta bort ${building.name}`}
         title={
           count > 0
-            ? `Tar bort huset och ${count} ${count === 1 ? "lägenhet" : "lägenheter"}`
+            ? `Tar bort ${terms.groupDefinite} och ${countText(count)}`
             : `Ta bort ${building.name}`
         }
         className="rounded border border-transparent px-2 py-1 text-sm font-medium text-red-600 hover:bg-red-50"
@@ -269,43 +265,32 @@ function NewBuildingForm() {
 
   return (
     <form action={action} className="space-y-3 rounded-card border border-border bg-surface p-4">
-      <h3 className="font-semibold">Nytt hus</h3>
+      <h3 className="font-semibold">Nytt {terms.group}</h3>
       {state.error ? <FormError>{state.error}</FormError> : null}
       {state.success ? <FormSuccess>{state.success}</FormSuccess> : null}
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Namn" htmlFor="new-building-name" required hint="T.ex. Hus 43, Trapphus B.">
+        <Field label="Namn" htmlFor="new-building-name" required hint={terms.groupHint}>
           <Input id="new-building-name" name="name" ref={nameRef} required />
         </Field>
-        <Field label="Adress" htmlFor="new-building-address" hint="Valfri, t.ex. Solvägen 43.">
+        <Field label="Adress" htmlFor="new-building-address" hint="Valfri.">
           <Input id="new-building-address" name="address" />
         </Field>
         <Field
           label="Startnummer"
           htmlFor="new-building-start"
-          hint="Första lägenhetsnumret. Nollor behålls: 0312 ger fyrsiffriga nummer."
+          hint={`Första ${terms.unitNumberDefinite} i ${terms.groupDefinite}. Nollor behålls: 001 ger tresiffriga nummer.`}
         >
           <Input
             id="new-building-start"
             name="numberStart"
-            defaultValue="0101"
+            defaultValue="1"
             inputMode="numeric"
           />
         </Field>
-        <Field label="Riktning" htmlFor="new-building-direction" hint="Vilken våning som får de lägsta numren.">
-          <label className="flex items-center gap-2 py-2 text-sm">
-            <input
-              id="new-building-direction"
-              type="checkbox"
-              name="numberTopDown"
-              className="size-4 accent-brand-600"
-            />
-            Börja uppifrån i stället för på bottenplan
-          </label>
-        </Field>
       </div>
 
-      <SubmitButton>Lägg till hus</SubmitButton>
+      <SubmitButton>Lägg till {terms.group}</SubmitButton>
     </form>
   );
 }

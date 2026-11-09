@@ -2,6 +2,7 @@ import type { Building as DbBuilding } from "@prisma/client";
 import type { Building, BuildingWithCounts } from "@/lib/types";
 import { getTenantDb } from "@/lib/tenant";
 import { buildApartmentNumbers, type NumberingInput } from "@/lib/numbering";
+import { terms } from "@/config/terms";
 
 /** Bara siffror, minst en. Tomt fält faller tillbaka på "1". */
 function normalizeStart(value: string): string {
@@ -262,5 +263,71 @@ export async function createApartmentsInBulk(
       created: fresh.length,
       skipped: planned.filter((p) => taken.has(p.number)).map((p) => p.number),
     },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Massinläggning av fastigheter (EkoSam) – utan våningar och lantmäterinummer
+// ---------------------------------------------------------------------------
+
+export interface BulkPropertyInput {
+  buildingId: string;
+  /** Första fastighetsnumret, t.ex. "1" eller "001". Bredden behålls. */
+  start: string;
+  /** Hur många fastigheter i följd. */
+  count: number;
+}
+
+/**
+ * Lägger upp fastigheter i ett område med nummer i följd. Fastigheter har
+ * inga våningar och inget lantmäterinummer – fastighetsbeteckningen skrivs in
+ * per fastighet efteråt. Befintliga nummer hoppas över, som för lägenheterna.
+ */
+export async function createPropertiesInBulk(
+  input: BulkPropertyInput,
+): Promise<{ ok: true; result: BulkResult } | { ok: false; error: string }> {
+  if (!Number.isInteger(input.count) || input.count < 1) {
+    return { ok: false, error: `Ange hur många ${terms.units} som ska läggas till.` };
+  }
+  if (input.count > 300) {
+    return { ok: false, error: `För många ${terms.units} på en gång (max 300).` };
+  }
+
+  const { db, associationId } = await getTenantDb();
+  const building = await db.building.findFirst({
+    where: { id: input.buildingId },
+  });
+  if (!building) return { ok: false, error: `${terms.GroupDefinite} hittades inte.` };
+
+  // Samma numrering som formulärets förhandsvisning: en "våning" med alla
+  // fastigheterna. Lantmäterinumret som räknas fram används inte.
+  const planned = buildApartmentNumbers({
+    floors: [{ floor: 0, count: input.count }],
+    start: input.start,
+    topDown: false,
+  }).map((p) => p.number);
+
+  const existing = await db.apartment.findMany({
+    where: { number: { in: planned } },
+    select: { number: true },
+  });
+  const taken = new Set(existing.map((e) => e.number));
+  const fresh = planned.filter((n) => !taken.has(n));
+
+  if (fresh.length > 0) {
+    await db.apartment.createMany({
+      data: fresh.map((number) => ({
+        associationId,
+        buildingId: input.buildingId,
+        number,
+        standardNumber: "",
+        floor: "",
+      })),
+    });
+  }
+
+  return {
+    ok: true,
+    result: { created: fresh.length, skipped: planned.filter((n) => taken.has(n)) },
   };
 }

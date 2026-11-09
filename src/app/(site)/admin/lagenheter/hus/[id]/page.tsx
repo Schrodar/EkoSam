@@ -9,9 +9,10 @@ import {
   getUnassignedApartments,
 } from "@/lib/data";
 import type { Apartment } from "@/lib/types";
-import { floorLabel, formatApartmentNumber } from "@/lib/numbering";
-import { Badge, Card, CardBody, EmptyState, PageHeader } from "@/components/ui";
-import { BulkAddForm } from "../../bulk-add-form";
+import { formatApartmentNumber } from "@/lib/numbering";
+import { terms } from "@/config/terms";
+import { Card, CardBody, EmptyState, PageHeader } from "@/components/ui";
+import { BulkAddPropertiesForm } from "../../bulk-add-properties-form";
 import { CodeSection } from "../../code-section";
 import { MoveApartmentForm } from "../../move-apartment-form";
 
@@ -19,9 +20,14 @@ interface Props {
   params: Promise<{ id: string }>;
 }
 
-/** Samlingsvyn för lägenheter som saknar hus använder samma sida. */
+/** Samlingsvyn för fastigheter som saknar område använder samma sida. */
 const UNASSIGNED = "ej-placerade";
 
+/**
+ * EkoSam: fastigheterna i ett område. Fastigheter har varken våningar, rum,
+ * yta eller planritning, så tabellen visar bara numret med
+ * fastighetsbeteckningen och kontots läge.
+ */
 function ApartmentTable({
   apartments,
   buildings,
@@ -33,12 +39,10 @@ function ApartmentTable({
 }) {
   return (
     <div className="overflow-x-auto rounded-card border border-border bg-surface">
-      <table className="w-full min-w-[720px] text-sm">
+      <table className="w-full min-w-[560px] text-sm">
         <thead className="border-b border-border text-left text-muted">
           <tr>
-            <th className="px-4 py-3 font-medium">Lägenhet</th>
-            <th className="px-4 py-3 font-medium">Fakta</th>
-            <th className="px-4 py-3 font-medium">Planritning</th>
+            <th className="px-4 py-3 font-medium">{terms.Unit}</th>
             <th className="px-4 py-3 font-medium">Konto</th>
             <th className="px-4 py-3 font-medium">Flytta till</th>
             <th className="px-4 py-3 text-right font-medium">Åtgärd</th>
@@ -51,19 +55,6 @@ function ApartmentTable({
                 <span className="font-medium text-foreground">
                   {formatApartmentNumber(a.number, a.standardNumber)}
                 </span>
-                {a.forSale ? (
-                  <Badge tone="brand" className="ml-2">
-                    Till salu
-                  </Badge>
-                ) : null}
-              </td>
-              <td className="px-4 py-3 text-muted">
-                {[a.floor !== "" && floorLabel(Number(a.floor)), a.rooms, a.sizeSqm && `${a.sizeSqm} m²`]
-                  .filter(Boolean)
-                  .join(" · ") || "–"}
-              </td>
-              <td className="px-4 py-3 text-muted">
-                {a.floorPlanPath ? "Uppladdad" : "–"}
               </td>
               <td className="px-4 py-3 text-muted">
                 {a.ownerMemberId
@@ -117,7 +108,7 @@ export default async function BuildingPage({ params }: Props) {
         title={unassignedView ? "Ej placerade" : building!.name}
         description={
           unassignedView
-            ? "Lägenheter som inte hör till något hus ännu. Placera dem för att få med dem i översikten."
+            ? `${terms.Units} som inte hör till något ${terms.group} ännu. Placera dem för att få med dem i översikten.`
             : building!.address || undefined
         }
         actions={
@@ -125,7 +116,7 @@ export default async function BuildingPage({ params }: Props) {
             href="/admin/lagenheter"
             className="text-sm font-medium text-brand-700 hover:underline"
           >
-            ← Alla hus
+            ← Alla {terms.groups}
           </Link>
         }
       />
@@ -134,8 +125,8 @@ export default async function BuildingPage({ params }: Props) {
         <EmptyState
           title={
             unassignedView
-              ? "Alla lägenheter är placerade"
-              : "Inga lägenheter i huset ännu"
+              ? `Alla ${terms.units} är placerade`
+              : `Inga ${terms.units} i ${terms.groupDefinite} ännu`
           }
         />
       ) : (
@@ -151,7 +142,7 @@ export default async function BuildingPage({ params }: Props) {
           apartments={apartments}
           scope={id}
           sender={{ name: profile.name, contactEmail: profile.contactEmail }}
-          title={unassignedView ? "Koder och brev" : "Koder och brev för huset"}
+          title={unassignedView ? "Koder och brev" : `Koder och brev för ${terms.groupDefinite}`}
         />
       ) : null}
 
@@ -159,18 +150,15 @@ export default async function BuildingPage({ params }: Props) {
         <Card>
           <CardBody className="space-y-4">
             <div>
-              <h3 className="font-semibold">Lägg till flera lägenheter</h3>
+              <h3 className="font-semibold">Lägg till {terms.units}</h3>
               <p className="text-sm text-muted">
-                Numren löper från husets startnummer ({building!.numberStart})
-                och fortsätter mellan våningarna. Nummer som redan finns hoppas
-                över, och varje nummer går att ändra i efterhand.
+                Numren löper i följd från {terms.groupDefinite}s startnummer (
+                {building!.numberStart}). Nummer som redan finns hoppas över,
+                och varje {terms.unit} går att ändra i efterhand – där skriver du
+                också in {terms.officialNumber}en.
               </p>
             </div>
-            <BulkAddForm
-              buildingId={id}
-              numberStart={building!.numberStart}
-              numberTopDown={building!.numberTopDown}
-            />
+            <BulkAddPropertiesForm buildingId={id} numberStart={building!.numberStart} />
           </CardBody>
         </Card>
       ) : null}
