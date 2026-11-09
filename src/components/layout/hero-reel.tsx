@@ -4,7 +4,6 @@ import Image from "next/image";
 import {
   useEffect,
   useRef,
-  useState,
   useSyncExternalStore,
   type CSSProperties,
 } from "react";
@@ -21,8 +20,8 @@ import type { HeroClip, HeroReelConfig } from "@/config/hero-reel";
  *   det, ligger den synliga bilden kvar (som sista bildruta) tills det går.
  * - Tidtagningen är en timer räknad på klippets position, toningen en Web
  *   Animation – inga React-uppdateringar och ingen loop per bildruta.
- * - Rullen pausas när heron inte syns, när fliken ligger i bakgrunden och med
- *   pausknappen. Toningen pausas med den.
+ * - Rullen pausas när heron inte syns eller fliken ligger i bakgrunden.
+ *   Toningen pausas med filmen.
  * - Vid prefers-reduced-motion och i datasparläge hämtas ingen film: då syns
  *   stillbilden, som också syns innan filmen startat och utan JavaScript.
  */
@@ -62,17 +61,12 @@ function layerPosition(clip: HeroClip): CSSProperties {
 export function HeroReel({ reel }: { reel: HeroReelConfig }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
-  const userPausedRef = useRef(false);
-  // Pausknappen når rullens motor härigenom – den lever i effekten nedan.
-  const syncRef = useRef<() => void>(() => {});
   // Film eller stillbild. Läses i webbläsaren – på servern blir det stillbild.
   const enabled = useSyncExternalStore(
     subscribeToMotion,
     () => !prefersStill(),
     () => false,
   );
-  const [started, setStarted] = useState(false);
-  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
     if (!enabled) return;
@@ -93,7 +87,7 @@ export function HeroReel({ reel }: { reel: HeroReelConfig }) {
     let trigger = 0;
     let inView = true;
 
-    const shouldRun = () => !userPausedRef.current && !document.hidden && inView;
+    const shouldRun = () => !document.hidden && inView;
 
     // Läget syns i DOM:en (data-phase, data-active) – skrivs bara vid byten.
     function setPhase(next: Phase) {
@@ -142,6 +136,14 @@ export function HeroReel({ reel }: { reel: HeroReelConfig }) {
       if (existing) return existing;
       const video = videos[index];
       const clip = reel.clips[index];
+      // Sätt även DOM-egenskaperna före src för ljudlös inline-video på iOS.
+      video.controls = false;
+      video.muted = true;
+      video.defaultMuted = true;
+      video.playsInline = true;
+      video.setAttribute("muted", "");
+      video.setAttribute("playsinline", "");
+      video.setAttribute("webkit-playsinline", "");
       const promise = (async () => {
         if (video.getAttribute("src") !== clip.src) {
           video.preload = "auto";
@@ -293,12 +295,17 @@ export function HeroReel({ reel }: { reel: HeroReelConfig }) {
         active = 0;
         container!.dataset.active = "0";
         setPhase("playing");
-        setStarted(true);
         scheduleTrigger();
         void prepare(1 % videos.length).catch(() => {});
       } catch {
         // Första klippet gick inte att spela: stillbilden ligger kvar.
-        if (!signal.aborted) stop();
+        if (!signal.aborted) {
+          for (const video of videos) {
+            video.pause();
+            video.style.visibility = "hidden";
+          }
+          stop();
+        }
       }
     }
 
@@ -362,7 +369,7 @@ export function HeroReel({ reel }: { reel: HeroReelConfig }) {
       );
     }
 
-    /** Spelar eller pausar allt efter läget: pausknapp, flik och synlighet. */
+    /** Spelar eller pausar efter flikens och herons synlighet. */
     function sync() {
       if (signal.aborted) return;
       if (!shouldRun()) {
@@ -391,7 +398,6 @@ export function HeroReel({ reel }: { reel: HeroReelConfig }) {
         }
       }
     }
-    syncRef.current = sync;
 
     document.addEventListener("visibilitychange", sync, { signal });
     const observer = new IntersectionObserver(
@@ -411,26 +417,19 @@ export function HeroReel({ reel }: { reel: HeroReelConfig }) {
       clearTrigger();
       unguardFade();
       fade?.cancel();
-      syncRef.current = () => {};
       for (const video of videos) {
         video.pause();
         video.removeAttribute("src");
         video.load();
         video.style.opacity = "0";
         video.style.zIndex = "";
+        video.style.visibility = "";
       }
       delete container.dataset.phase;
       delete container.dataset.active;
-      setStarted(false);
     };
   }, [enabled, reel]);
 
-  function togglePause() {
-    const next = !userPausedRef.current;
-    userPausedRef.current = next;
-    setPaused(next);
-    syncRef.current();
-  }
 
   return (
     <>
@@ -439,7 +438,7 @@ export function HeroReel({ reel }: { reel: HeroReelConfig }) {
       <div
         ref={containerRef}
         aria-hidden="true"
-        className="absolute inset-0 isolate overflow-hidden"
+        className="pointer-events-none absolute inset-0 isolate overflow-hidden"
       >
         {/* Stillbild ur första klippet: syns före filmen, utan JavaScript och
             vid minskad rörelse. */}
@@ -458,9 +457,13 @@ export function HeroReel({ reel }: { reel: HeroReelConfig }) {
             ref={(element) => {
               videoRefs.current[index] = element;
             }}
-            className="hero-reel-layer absolute inset-0 h-full w-full object-cover"
+            className="hero-background-video hero-reel-layer pointer-events-none absolute inset-0 h-full w-full object-cover"
             style={{ ...layerPosition(clip), opacity: 0 }}
             autoPlay={index === 0}
+            controls={false}
+            controlsList="nodownload nofullscreen noremoteplayback"
+            tabIndex={-1}
+            {...{ "webkit-playsinline": "true", "x-webkit-airplay": "deny" }}
             muted
             playsInline
             preload="none"
@@ -470,26 +473,6 @@ export function HeroReel({ reel }: { reel: HeroReelConfig }) {
         ))}
       </div>
 
-      {enabled && started ? (
-        <button
-          type="button"
-          onClick={togglePause}
-          aria-pressed={paused}
-          aria-label={paused ? "Spela bakgrundsfilmen" : "Pausa bakgrundsfilmen"}
-          title={paused ? "Spela filmen" : "Pausa filmen"}
-          className="absolute bottom-5 right-4 z-20 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-black/15 text-white/80 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-white sm:right-6"
-        >
-          {paused ? (
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-              <path d="M5 3.2v9.6L13 8z" />
-            </svg>
-          ) : (
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-              <path d="M4.5 3h2.5v10H4.5zM9 3h2.5v10H9z" />
-            </svg>
-          )}
-        </button>
-      ) : null}
     </>
   );
 }

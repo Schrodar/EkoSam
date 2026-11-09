@@ -70,9 +70,15 @@ export function SiteHeader({
       ) : hero.video ? (
         <video
           aria-hidden="true"
-          className="absolute inset-0 h-full w-full object-cover"
+          className="hero-background-video pointer-events-none absolute inset-0 h-full w-full object-cover"
           src={hero.video}
           poster={hero.image}
+          controls={false}
+          controlsList="nodownload nofullscreen noremoteplayback"
+          disablePictureInPicture
+          disableRemotePlayback
+          tabIndex={-1}
+          {...{ "webkit-playsinline": "true", "x-webkit-airplay": "deny" }}
           autoPlay
           muted
           loop

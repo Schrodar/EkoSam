@@ -433,3 +433,42 @@ body {
 .board-fade {
   animation: board-fade 1.2s ease-out both;
 }
+
+/* Bakgrundsvideo: ingen interaktion eller inbyggd kontrollpanel.
+   Gäller bara herons filmer, inte andra videospelare på sidan. */
+.hero-background-video {
+  pointer-events: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.hero-background-video::-webkit-media-controls {
+  display: none !important;
+  -webkit-appearance: none;
+}
+
+.hero-background-video::-webkit-media-controls-enclosure {
+  display: none !important;
+  -webkit-appearance: none;
+}
+
+.hero-background-video::-webkit-media-controls-panel {
+  display: none !important;
+  -webkit-appearance: none;
+}
+
+.hero-background-video::-webkit-media-controls-overlay-enclosure {
+  display: none !important;
+  -webkit-appearance: none;
+}
+
+.hero-background-video::-webkit-media-controls-overlay-play-button {
+  display: none !important;
+  -webkit-appearance: none;
+}
+
+.hero-background-video::-webkit-media-controls-start-playback-button {
+  display: none !important;
+  -webkit-appearance: none;
+}
