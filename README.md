@@ -1,8 +1,12 @@
-# EkoSam – hemsida för en samfällighetsförening
+# EkoSam – hemsida för Ekbackens samfällighetsförening
 
 EkoSam är [BrfStart](https://github.com/Schrodar/BrfStart) anpassad för en
 samfällighetsförening: publik information, Mina sidor för varje fastighet och
 en adminpanel där styrelsen sköter innehållet själv.
+
+Föreningen heter **Ekbackens samfällighetsförening** (kortnamn Ekbacken) och
+har sluggen `ekosam` i den delade databasen. Namnet ligger på föreningsraden
+och ändras under Admin → Föreningsinfo → Namn och kontakt.
 
 **Skillnaderna mot BrfStart** samlas på två ställen, så att de kan flyttas
 till BrfStart som en föreningstyp när EkoSam är klar:

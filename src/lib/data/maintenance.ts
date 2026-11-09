@@ -37,7 +37,7 @@ export {
 export const DEFAULT_MAINTENANCE_CATEGORIES = [
   "Vägar och gångvägar",
   "Belysning",
-  "Lekplats",
+  "Badpoolen",
   "Grönytor och träd",
   "Snöröjning och halka",
   "Övrigt",
@@ -53,7 +53,7 @@ export const DEFAULT_MAINTENANCE_CATEGORIES = [
  */
 export const DEFAULT_MAINTENANCE_SETTINGS: MaintenanceSettings = {
   introText:
-    "Felanmälan gäller samfällighetens gemensamma anläggningar – till exempel vägar, belysning, lekplats och grönytor. Fel på din egen fastighet ansvarar du som fastighetsägare för själv.",
+    "Felanmälan gäller samfällighetens gemensamma anläggningar – till exempel vägar, belysning, badpoolen och grönytor. Fel på din egen fastighet ansvarar du som fastighetsägare för själv.",
   emergencyPhone: "",
   emergencyText: "",
   caretakerName: "",

@@ -72,7 +72,7 @@ export function InfoForm({ info }: { info: AssociationInfo }) {
       <Field
         label="Gemensamma anläggningar"
         htmlFor="commonAreas"
-        hint="T.ex. vägar, belysning, lekplats och grönytor."
+        hint="T.ex. vägar, belysning, badpool och grönytor."
       >
         <Textarea
           id="commonAreas"
